@@ -24,6 +24,7 @@
   </admin-layout>
 </template>
 
+
 <script>
 import AdminLayout from '../components/layout/AdminLayout.vue'
 import EcommerceMetrics from '../components/ecommerce/EcommerceMetrics.vue'

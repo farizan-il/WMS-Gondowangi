@@ -1,254 +1,744 @@
 <template>
   <div class="space-y-6">
-    <!-- Text Input -->
-    <div>
-      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-        Input
-      </label>
-      <input
-        type="text"
-        v-model="formData.input"
-        class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-      />
+    <!-- Header dengan tombol Buat Penerimaan -->
+    <div class="flex justify-between items-center">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Daftar Penerimaan</h2>
+      <button
+        @click="showModal = true"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Buat Penerimaan
+      </button>
     </div>
 
-    <!-- Input with Placeholder -->
-    <div>
-      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-        Input with Placeholder
-      </label>
-      <input
-        type="text"
-        v-model="formData.inputWithPlaceholder"
-        placeholder="info@gmail.com"
-        class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-      />
-    </div>
-
-    <!-- Select Input -->
-    <div>
-      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-        Select Input
-      </label>
-      <div class="relative z-20 bg-transparent">
-        <select
-          v-model="formData.selectInput"
-          class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-          :class="{ 'text-gray-800 dark:text-white/90': formData.selectInput }"
-        >
-          <option value="" disabled selected>Select Option</option>
-          <option value="marketing">Marketing</option>
-          <option value="template">Template</option>
-          <option value="development">Development</option>
-        </select>
-        <span
-          class="absolute z-30 text-gray-500 -translate-y-1/2 pointer-events-none right-4 top-1/2 dark:text-gray-400"
-        >
-          <svg
-            class="stroke-current"
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396"
-              stroke=""
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </span>
+    <!-- Tabel Daftar Penerimaan -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">No PO</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">No Surat Jalan</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Supplier</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Tanggal Terima</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">No Kendaraan</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tr v-for="shipment in shipments" :key="shipment.id" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ shipment.noPo }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ shipment.noSuratJalan }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ shipment.supplier }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(shipment.tanggalTerima) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ shipment.noKendaraan }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span :class="getStatusClass(shipment.status)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                  {{ shipment.status }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div class="flex space-x-2">
+                  <button @click="viewDetail(shipment)" class="bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-800 px-2 py-1 rounded text-xs">Detail</button>
+                  <button @click="printChecklist(shipment)" class="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800 px-2 py-1 rounded text-xs">Cetak Checklist</button>
+                  <button @click="showQRModal(shipment)" class="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 px-2 py-1 rounded text-xs">Cetak Label QR</button>
+                  <button v-if="shipment.status === 'Arrived'" @click="lanjutQC(shipment)" class="bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-800 px-2 py-1 rounded text-xs">Lanjut QC</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <!-- Password Input -->
-    <div>
-      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-        Password Input
-      </label>
-      <div class="relative">
-        <input
-          :type="showPassword ? 'text' : 'password'"
-          v-model="formData.password"
-          placeholder="Enter your password"
-          class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-        />
-        <span
-          @click="showPassword = !showPassword"
-          class="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
-        >
-          <svg
-            v-if="!showPassword"
-            class="fill-gray-500 dark:fill-gray-400"
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M10.0002 13.8619C7.23361 13.8619 4.86803 12.1372 3.92328 9.70241C4.86804 7.26761 7.23361 5.54297 10.0002 5.54297C12.7667 5.54297 15.1323 7.26762 16.0771 9.70243C15.1323 12.1372 12.7667 13.8619 10.0002 13.8619ZM10.0002 4.04297C6.48191 4.04297 3.49489 6.30917 2.4155 9.4593C2.3615 9.61687 2.3615 9.78794 2.41549 9.94552C3.49488 13.0957 6.48191 15.3619 10.0002 15.3619C13.5184 15.3619 16.5055 13.0957 17.5849 9.94555C17.6389 9.78797 17.6389 9.6169 17.5849 9.45932C16.5055 6.30919 13.5184 4.04297 10.0002 4.04297ZM9.99151 7.84413C8.96527 7.84413 8.13333 8.67606 8.13333 9.70231C8.13333 10.7286 8.96527 11.5605 9.99151 11.5605H10.0064C11.0326 11.5605 11.8646 10.7286 11.8646 9.70231C11.8646 8.67606 11.0326 7.84413 10.0064 7.84413H9.99151Z"
-            />
-          </svg>
-          <svg
-            v-else
-            class="fill-gray-500 dark:fill-gray-400"
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M4.63803 3.57709C4.34513 3.2842 3.87026 3.2842 3.57737 3.57709C3.28447 3.86999 3.28447 4.34486 3.57737 4.63775L4.85323 5.91362C3.74609 6.84199 2.89363 8.06395 2.4155 9.45936C2.3615 9.61694 2.3615 9.78801 2.41549 9.94558C3.49488 13.0957 6.48191 15.3619 10.0002 15.3619C11.255 15.3619 12.4422 15.0737 13.4994 14.5598L15.3625 16.4229C15.6554 16.7158 16.1302 16.7158 16.4231 16.4229C16.716 16.13 16.716 15.6551 16.4231 15.3622L4.63803 3.57709ZM12.3608 13.4212L10.4475 11.5079C10.3061 11.5423 10.1584 11.5606 10.0064 11.5606H9.99151C8.96527 11.5606 8.13333 10.7286 8.13333 9.70237C8.13333 9.5461 8.15262 9.39434 8.18895 9.24933L5.91885 6.97923C5.03505 7.69015 4.34057 8.62704 3.92328 9.70247C4.86803 12.1373 7.23361 13.8619 10.0002 13.8619C10.8326 13.8619 11.6287 13.7058 12.3608 13.4212ZM16.0771 9.70249C15.7843 10.4569 15.3552 11.1432 14.8199 11.7311L15.8813 12.7925C16.6329 11.9813 17.2187 11.0143 17.5849 9.94561C17.6389 9.78803 17.6389 9.61696 17.5849 9.45938C16.5055 6.30925 13.5184 4.04303 10.0002 4.04303C9.13525 4.04303 8.30244 4.17999 7.52218 4.43338L8.75139 5.66259C9.1556 5.58413 9.57311 5.54303 10.0002 5.54303C12.7667 5.54303 15.1323 7.26768 16.0771 9.70249Z"
-            />
-          </svg>
-        </span>
+    <!-- Modal Form Buat Penerimaan -->
+    <div v-if="showModal" class="fixed inset-0 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[9999]" style="background-color: #2b333fab;">
+      <div class="bg-white dark:bg-gray-800 rounded-lg max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+          <!-- Header Modal -->
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Buat Penerimaan Baru</h3>
+            <button @click="closeModal" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Form Header -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No PO *</label>
+              <select v-model="newShipment.noPo" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                <option value="">Pilih No PO</option>
+                <option v-for="po in dummyPOs" :key="po" :value="po">{{ po }}</option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No Surat Jalan *</label>
+              <input v-model="newShipment.noSuratJalan" type="text" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Supplier *</label>
+              <select v-model="newShipment.supplier" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                <option value="">Pilih Supplier</option>
+                <option v-for="supplier in dummySuppliers" :key="supplier" :value="supplier">{{ supplier }}</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No Kendaraan *</label>
+              <input v-model="newShipment.noKendaraan" type="text" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Driver *</label>
+              <input v-model="newShipment.namaDriver" type="text" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tanggal & Waktu Terima</label>
+              <input v-model="newShipment.tanggalTerima" type="datetime-local" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kategori</label>
+              <select v-model="newShipment.kategori" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                <option value="">Pilih Kategori</option>
+                <option value="Raw Material">Raw Material</option>
+                <option value="Packaging Material">Packaging Material</option>
+                <option value="Spare Part">Spare Part</option>
+                <option value="Office Supply">Office Supply</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Upload Dokumen</label>
+              <input type="file" multiple accept="image/*,.pdf" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+          </div>
+
+          <!-- Detail Items -->
+          <div class="border-t border-gray-200 dark:border-gray-600 pt-6">
+            <div class="flex justify-between items-center mb-4">
+              <h4 class="text-lg font-medium text-gray-900 dark:text-white">Detail Material</h4>
+              <button @click="addNewItem" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
+                + Tambah Baris
+              </button>
+            </div>
+
+            <div class="overflow-x-auto border border-gray-200 dark:border-gray-600 rounded-lg">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600" style="min-width: 1200px;">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                  <tr>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Kode Item</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Nama Material</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Batch/Mfg Lot</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Exp Date</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Qty Wadah</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Qty Unit</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Kondisi</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">CoA</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Label Mfg</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Status QC</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-600 bg-white dark:bg-gray-800">
+                  <tr v-for="(item, index) in newShipment.items" :key="index">
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <select v-model="item.kodeItem" @change="updateNamaMaterial(index)" class="w-32 text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="">Pilih SKU</option>
+                        <option v-for="sku in dummySKUs" :key="sku.code" :value="sku.code">{{ sku.code }}</option>
+                      </select>
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <input v-model="item.namaMaterial" type="text" readonly class="w-40 text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-gray-50 dark:bg-gray-600 text-gray-900 dark:text-white">
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <input v-model="item.batchLot" type="text" class="w-28 text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <input v-model="item.expDate" type="date" class="w-36 text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <input v-model="item.qtyWadah" type="number" class="w-24 text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <input v-model="item.qtyUnit" type="number" class="w-24 text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <select v-model="item.kondisi" class="w-28 text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="">Pilih</option>
+                        <option value="Baik">Baik</option>
+                        <option value="Tidak Baik">Tidak Baik</option>
+                      </select>
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <select v-model="item.coa" class="w-24 text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="">Pilih</option>
+                        <option value="Ada">Ada</option>
+                        <option value="Tidak Ada">Tidak Ada</option>
+                      </select>
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <select v-model="item.labelMfg" class="w-24 text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="">Pilih</option>
+                        <option value="Ada">Ada</option>
+                        <option value="Tidak Ada">Tidak Ada</option>
+                      </select>
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <span class="text-sm text-gray-600 dark:text-gray-400">{{ item.statusQC }}</span>
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <button @click="removeItem(index)" class="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800 px-2 py-1 rounded text-xs">Hapus</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Footer Modal -->
+          <div class="flex justify-end space-x-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
+            <button @click="closeModal" class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">
+              Batal
+            </button>
+            <button @click="saveShipment" :disabled="!isFormValid" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400">
+              Simpan
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Date Picker Input -->
-    <div>
-      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-        Date Picker Input
-      </label>
-      <div class="relative">
-        <flat-pickr
-          v-model="date"
-          :config="flatpickrConfig"
-          class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-          placeholder="Select date"
-        />
-        <span
-          class="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400"
-        >
-          <svg
-            class="fill-current"
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M6.66659 1.5415C7.0808 1.5415 7.41658 1.87729 7.41658 2.2915V2.99984H12.5833V2.2915C12.5833 1.87729 12.919 1.5415 13.3333 1.5415C13.7475 1.5415 14.0833 1.87729 14.0833 2.2915V2.99984L15.4166 2.99984C16.5212 2.99984 17.4166 3.89527 17.4166 4.99984V7.49984V15.8332C17.4166 16.9377 16.5212 17.8332 15.4166 17.8332H4.58325C3.47868 17.8332 2.58325 16.9377 2.58325 15.8332V7.49984V4.99984C2.58325 3.89527 3.47868 2.99984 4.58325 2.99984L5.91659 2.99984V2.2915C5.91659 1.87729 6.25237 1.5415 6.66659 1.5415ZM6.66659 4.49984H4.58325C4.30711 4.49984 4.08325 4.7237 4.08325 4.99984V6.74984H15.9166V4.99984C15.9166 4.7237 15.6927 4.49984 15.4166 4.49984H13.3333H6.66659ZM15.9166 8.24984H4.08325V15.8332C4.08325 16.1093 4.30711 16.3332 4.58325 16.3332H15.4166C15.6927 16.3332 15.9166 16.1093 15.9166 15.8332V8.24984Z"
-              fill=""
-            />
-          </svg>
-        </span>
-      </div>
-    </div>
+    <!-- Modal QR Code -->
+    <div v-if="showQRCodeModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[9999]">
+      <div class="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+        <div class="p-6">
+          <!-- Header Modal QR -->
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Label QR Code - {{ selectedShipment?.noSuratJalan }}</h3>
+            <button @click="closeQRModal" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
 
-    <!-- Time Select Input -->
-    <div>
-      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-        Time Select Input
-      </label>
-      <div class="relative">
-        <flat-pickr
-          v-model="time"
-          :config="flatpickrTimeConfig"
-          class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-          placeholder="Select time"
-        />
-        <span class="absolute text-gray-500 -translate-y-1/2 right-3 top-1/2 dark:text-gray-400">
-          <svg
-            class="fill-current"
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M3.04175 9.99984C3.04175 6.15686 6.1571 3.0415 10.0001 3.0415C13.8431 3.0415 16.9584 6.15686 16.9584 9.99984C16.9584 13.8428 13.8431 16.9582 10.0001 16.9582C6.1571 16.9582 3.04175 13.8428 3.04175 9.99984ZM10.0001 1.5415C5.32867 1.5415 1.54175 5.32843 1.54175 9.99984C1.54175 14.6712 5.32867 18.4582 10.0001 18.4582C14.6715 18.4582 18.4584 14.6712 18.4584 9.99984C18.4584 5.32843 14.6715 1.5415 10.0001 1.5415ZM9.99998 10.7498C9.58577 10.7498 9.24998 10.4141 9.24998 9.99984V5.4165C9.24998 5.00229 9.58577 4.6665 9.99998 4.6665C10.4142 4.6665 10.75 5.00229 10.75 5.4165V9.24984H13.3334C13.7476 9.24984 14.0834 9.58562 14.0834 9.99984C14.0834 10.4141 13.7476 10.7498 13.3334 10.7498H10.0001H9.99998Z"
-              fill=""
-            />
-          </svg>
-        </span>
-      </div>
-    </div>
+          <!-- Info Shipment -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span class="font-medium text-gray-700 dark:text-gray-300">No PO:</span>
+                <span class="ml-2 text-gray-900 dark:text-white">{{ selectedShipment?.noPo }}</span>
+              </div>
+              <div>
+                <span class="font-medium text-gray-700 dark:text-gray-300">Supplier:</span>
+                <span class="ml-2 text-gray-900 dark:text-white">{{ selectedShipment?.supplier }}</span>
+              </div>
+              <div>
+                <span class="font-medium text-gray-700 dark:text-gray-300">No Kendaraan:</span>
+                <span class="ml-2 text-gray-900 dark:text-white">{{ selectedShipment?.noKendaraan }}</span>
+              </div>
+              <div>
+                <span class="font-medium text-gray-700 dark:text-gray-300">Tanggal:</span>
+                <span class="ml-2 text-gray-900 dark:text-white">{{ formatDate(selectedShipment?.tanggalTerima) }}</span>
+              </div>
+            </div>
+          </div>
 
-    <!-- Input with Payment -->
-    <div>
-      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-        Input with Payment
-      </label>
-      <div class="relative">
-        <input
-          type="text"
-          v-model="formData.cardNumber"
-          placeholder="Card number"
-          class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-[62px] text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-        />
-        <span
-          class="absolute left-0 top-1/2 flex h-11 w-[46px] -translate-y-1/2 items-center justify-center border-r border-gray-200 dark:border-gray-800"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle cx="6.25" cy="10" r="5.625" fill="#E80B26" />
-            <circle cx="13.75" cy="10" r="5.625" fill="#F59D31" />
-            <path
-              d="M10 14.1924C11.1508 13.1625 11.875 11.6657 11.875 9.99979C11.875 8.33383 11.1508 6.8371 10 5.80713C8.84918 6.8371 8.125 8.33383 8.125 9.99979C8.125 11.6657 8.84918 13.1625 10 14.1924Z"
-              fill="#FC6020"
-            />
-          </svg>
-        </span>
+          <!-- Daftar QR Items -->
+          <div class="space-y-4">
+            <h4 class="text-md font-medium text-gray-900 dark:text-white">Daftar QR Code per Item:</h4>
+            <div v-if="selectedShipment?.items && selectedShipment.items.length > 0" class="space-y-4">
+              <div v-for="(item, index) in selectedShipment.items" :key="index" class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <!-- Info Item -->
+                  <div>
+                    <div class="font-medium text-gray-900 dark:text-white mb-2">{{ item.kodeItem }} - {{ item.namaMaterial }}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                      <div>Batch: {{ item.batchLot }}</div>
+                      <div>Qty: {{ item.qtyUnit }}</div>
+                      <div>Exp: {{ item.expDate }}</div>
+                    </div>
+                    <div class="bg-gray-100 dark:bg-gray-600 p-2 rounded font-mono text-xs text-gray-800 dark:text-gray-200 mt-3">
+                      <strong>QR Content:</strong><br>{{ item.qrCode }}
+                    </div>
+                    <div class="flex space-x-2 mt-3">
+                      <button @click="downloadQR(item)" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
+                        Download QR
+                      </button>
+                      <button @click="printSingleQR(item)" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+                        Cetak QR
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Preview QR -->
+                  <div class="flex flex-col items-center justify-center">
+                    <div class="bg-white p-4 rounded-lg border-2 border-gray-300 mb-2">
+                      <canvas :data-qr-canvas="index" class="block"></canvas>
+                    </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 text-center">
+                      Preview QR Code
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-else class="text-center py-8 text-gray-500 dark:text-gray-400">
+              Belum ada item untuk shipment ini
+            </div>
+          </div>
+
+          <!-- Footer Modal QR -->
+          <div class="flex justify-end space-x-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
+            <button @click="closeQRModal" class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">
+              Tutup
+            </button>
+            <button @click="printAllQR" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+              Cetak Semua QR
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-import flatPickr from 'vue-flatpickr-component'
-import 'flatpickr/dist/flatpickr.css'
+import { ref, computed, onMounted } from 'vue'
 
-const showPassword = ref(false)
+// Data reaktif
+const showModal = ref(false)
+const showQRCodeModal = ref(false)
+const selectedShipment = ref(null)
+const shipments = ref([])
 
-const formData = reactive({
-  input: '',
-  inputWithPlaceholder: '',
-  selectInput: '',
-  password: '',
-  date: '',
-  time: '',
-  cardNumber: '',
+// Data dummy untuk dropdown
+const dummyPOs = ref(['PO-001/2025', 'PO-002/2025', 'PO-003/2025'])
+const dummySuppliers = ref(['PT Supplier A', 'PT Supplier B', 'CV Supplier C'])
+const dummySKUs = ref([
+  { code: 'RM-001', name: 'Tepung Terigu' },
+  { code: 'RM-002', name: 'Gula Pasir' },
+  { code: 'PM-001', name: 'Kardus Box 20x30' },
+  { code: 'PM-002', name: 'Plastik Wrap' }
+])
+
+// Form data
+const newShipment = ref({
+  noPo: '',
+  noSuratJalan: '',
+  supplier: '',
+  noKendaraan: '',
+  namaDriver: '',
+  tanggalTerima: '',
+  kategori: '',
+  items: []
 })
 
-const date = ref(null)
-
-const flatpickrConfig = {
-  dateFormat: 'Y-m-d',
-  altInput: true,
-  altFormat: 'F j, Y',
-  wrap: true,
+// Data dummy untuk tabel
+const initDummyData = () => {
+  shipments.value = [
+    {
+      id: 1,
+      noPo: 'PO-001/2025',
+      noSuratJalan: 'SJ-001/2025',
+      supplier: 'PT Supplier A',
+      tanggalTerima: '2025-09-18T10:30:00',
+      noKendaraan: 'B 1234 CD',
+      status: 'Arrived',
+      items: [
+        {
+          kodeItem: 'RM-001',
+          namaMaterial: 'Tepung Terigu',
+          batchLot: 'BATCH001',
+          expDate: '2025-12-31',
+          qtyUnit: '50',
+          qrCode: 'IN/20250918/0001|RM-001|BATCH001|50|2025-12-31'
+        },
+        {
+          kodeItem: 'PM-001',
+          namaMaterial: 'Kardus Box 20x30',
+          batchLot: 'BATCH002',
+          expDate: '2026-06-30',
+          qtyUnit: '100',
+          qrCode: 'IN/20250918/0001|PM-001|BATCH002|100|2026-06-30'
+        }
+      ]
+    },
+    {
+      id: 2,
+      noPo: 'PO-002/2025',
+      noSuratJalan: 'SJ-002/2025',
+      supplier: 'PT Supplier B',
+      tanggalTerima: '2025-09-17T14:15:00',
+      noKendaraan: 'B 5678 EF',
+      status: 'QC',
+      items: [
+        {
+          kodeItem: 'RM-002',
+          namaMaterial: 'Gula Pasir',
+          batchLot: 'BATCH003',
+          expDate: '2025-11-15',
+          qtyUnit: '25',
+          qrCode: 'IN/20250917/0001|RM-002|BATCH003|25|2025-11-15'
+        }
+      ]
+    },
+    {
+      id: 3,
+      noPo: 'PO-003/2025',
+      noSuratJalan: 'SJ-003/2025',
+      supplier: 'CV Supplier C',
+      tanggalTerima: '2025-09-16T09:45:00',
+      noKendaraan: 'B 9012 GH',
+      status: 'Completed',
+      items: []
+    }
+  ]
 }
 
-const flatpickrTimeConfig = {
-  enableTime: true,
-  noCalendar: true,
-  dateFormat: 'H:i',
-  time_24hr: false,
-  minuteIncrement: 1,
-  wrap: false,
+// Computed
+const isFormValid = computed(() => {
+  return newShipment.value.noPo && 
+         newShipment.value.noSuratJalan && 
+         newShipment.value.supplier && 
+         newShipment.value.noKendaraan && 
+         newShipment.value.namaDriver &&
+         newShipment.value.items.length > 0
+})
+
+// Methods
+const closeModal = () => {
+  showModal.value = false
+  resetForm()
 }
 
-const time = ref(null)
+const closeQRModal = () => {
+  showQRCodeModal.value = false
+  selectedShipment.value = null
+}
+
+const resetForm = () => {
+  newShipment.value = {
+    noPo: '',
+    noSuratJalan: '',
+    supplier: '',
+    noKendaraan: '',
+    namaDriver: '',
+    tanggalTerima: new Date().toISOString().slice(0, 16),
+    kategori: '',
+    items: []
+  }
+}
+
+const addNewItem = () => {
+  newShipment.value.items.push({
+    kodeItem: '',
+    namaMaterial: '',
+    batchLot: '',
+    expDate: '',
+    qtyWadah: '',
+    qtyUnit: '',
+    kondisi: '',
+    coa: '',
+    labelMfg: '',
+    statusQC: 'To QC'
+  })
+}
+
+const removeItem = (index) => {
+  newShipment.value.items.splice(index, 1)
+}
+
+const updateNamaMaterial = (index) => {
+  const selectedSKU = dummySKUs.value.find(sku => sku.code === newShipment.value.items[index].kodeItem)
+  if (selectedSKU) {
+    newShipment.value.items[index].namaMaterial = selectedSKU.name
+    // Auto set status QC based on SKU type
+    if (selectedSKU.code.startsWith('RM-')) {
+      newShipment.value.items[index].statusQC = 'To QC'
+    } else {
+      newShipment.value.items[index].statusQC = 'Direct Putaway'
+    }
+  }
+}
+
+const saveShipment = () => {
+  // Generate ID dan incoming number
+  const newId = shipments.value.length + 1
+  const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+  const incomingNumber = `IN/${today}/${String(newId).padStart(4, '0')}`
+  
+  // Buat record shipment baru
+  const shipment = {
+    id: newId,
+    incomingNumber,
+    noPo: newShipment.value.noPo,
+    noSuratJalan: newShipment.value.noSuratJalan,
+    supplier: newShipment.value.supplier,
+    tanggalTerima: newShipment.value.tanggalTerima,
+    noKendaraan: newShipment.value.noKendaraan,
+    namaDriver: newShipment.value.namaDriver,
+    kategori: newShipment.value.kategori,
+    status: 'Arrived',
+    items: newShipment.value.items.map(item => ({
+      ...item,
+      qrCode: generateQR(incomingNumber, item.kodeItem, item.batchLot, item.qtyUnit, item.expDate)
+    }))
+  }
+  
+  shipments.value.unshift(shipment)
+  
+  alert(`Penerimaan berhasil disimpan dengan nomor: ${incomingNumber}`)
+  closeModal()
+}
+
+const generateQR = (shipmentId, itemId, lot, qty, expDate) => {
+  return `${shipmentId}|${itemId}|${lot}|${qty}|${expDate}`
+}
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString)
+  return date.toLocaleString('id-ID', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+const getStatusClass = (status) => {
+  const classes = {
+    'Draft': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+    'Arrived': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+    'QC': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+    'Completed': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+  }
+  return classes[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+}
+
+// Action handlers
+const viewDetail = (shipment) => {
+  alert(`Melihat detail shipment: ${shipment.incomingNumber || shipment.noSuratJalan}`)
+}
+
+const printChecklist = (shipment) => {
+  alert(`Mencetak checklist untuk: ${shipment.incomingNumber || shipment.noSuratJalan}`)
+}
+
+const showQRModal = (shipment) => {
+  selectedShipment.value = shipment
+  showQRCodeModal.value = true
+  // Generate QR codes after modal is shown
+  setTimeout(() => {
+    generateQRCodes()
+  }, 100)
+}
+
+const generateQRCodes = () => {
+  if (!selectedShipment.value?.items) return
+  
+  selectedShipment.value.items.forEach((item, index) => {
+    const canvas = document.querySelector(`canvas[data-qr-canvas="${index}"]`)
+    if (canvas) {
+      const ctx = canvas.getContext('2d')
+      canvas.width = 150
+      canvas.height = 150
+      
+      // Simple QR code placeholder (you can integrate real QR library here)
+      const size = 150
+      const moduleSize = size / 21 // 21x21 modules for simple QR
+      
+      // Create simple pattern based on QR content
+      const content = item.qrCode
+      let hash = 0
+      for (let i = 0; i < content.length; i++) {
+        hash = ((hash << 5) - hash + content.charCodeAt(i)) & 0xffffffff
+      }
+      
+      // Clear canvas with white background
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(0, 0, size, size)
+      ctx.fillStyle = '#000000'
+      
+      // Draw simple QR pattern
+      for (let row = 0; row < 21; row++) {
+        for (let col = 0; col < 21; col++) {
+          // Create pattern based on hash and position
+          const shouldFill = ((hash >> ((row + col) % 32)) & 1) === 1 || 
+                           (row < 7 && col < 7 && (row === 0 || row === 6 || col === 0 || col === 6)) || // Top-left finder
+                           (row < 7 && col >= 14 && (row === 0 || row === 6 || col === 14 || col === 20)) || // Top-right finder  
+                           (row >= 14 && col < 7 && (row === 14 || row === 20 || col === 0 || col === 6)) // Bottom-left finder
+          
+          if (shouldFill) {
+            ctx.fillRect(col * moduleSize, row * moduleSize, moduleSize - 0.5, moduleSize - 0.5)
+          }
+        }
+      }
+      
+      // Add center squares for finder patterns
+      ctx.fillRect(2 * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize) // Top-left
+      ctx.fillRect(16 * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize) // Top-right  
+      ctx.fillRect(2 * moduleSize, 16 * moduleSize, 3 * moduleSize, 3 * moduleSize) // Bottom-left
+    }
+  })
+}
+
+const downloadQR = (item) => {
+  const index = selectedShipment.value.items.findIndex(i => i === item)
+  const canvas = document.querySelector(`canvas[data-qr-canvas="${index}"]`)
+  
+  if (canvas) {
+    // Create download link
+    const link = document.createElement('a')
+    link.download = `QR_${item.kodeItem}_${item.batchLot}.png`
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+  }
+}
+
+const printSingleQR = (item) => {
+  const index = selectedShipment.value.items.findIndex(i => i === item)
+  const canvas = document.querySelector(`canvas[data-qr-canvas="${index}"]`)
+  
+  if (canvas) {
+    // Create print window with formatted label
+    const printWindow = window.open('', '_blank')
+    const qrDataURL = canvas.toDataURL('image/png')
+    
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>QR Label - ${item.kodeItem}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .label { border: 2px solid #000; padding: 15px; width: 300px; text-align: center; }
+            .qr-code { margin: 10px 0; }
+            .item-info { font-size: 12px; margin: 5px 0; }
+            .item-code { font-weight: bold; font-size: 14px; }
+            @media print {
+              body { margin: 0; }
+              .label { border: 2px solid #000; page-break-after: always; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="label">
+            <div class="item-code">${item.kodeItem}</div>
+            <div class="item-info">${item.namaMaterial}</div>
+            <div class="qr-code">
+              <img src="${qrDataURL}" width="120" height="120">
+            </div>
+            <div class="item-info">Batch: ${item.batchLot}</div>
+            <div class="item-info">Qty: ${item.qtyUnit}</div>
+            <div class="item-info">Exp: ${item.expDate}</div>
+            <div class="item-info">PO: ${selectedShipment.value.noPo}</div>
+          </div>
+        </body>
+      </html>
+    `)
+    
+    printWindow.document.close()
+    printWindow.focus()
+    
+    // Auto print after loading
+    setTimeout(() => {
+      printWindow.print()
+      printWindow.close()
+    }, 500)
+  }
+}
+
+const printAllQR = () => {
+  if (selectedShipment.value?.items?.length > 0) {
+    // Create print window with all labels
+    const printWindow = window.open('', '_blank')
+    let labelsHTML = ''
+    
+    selectedShipment.value.items.forEach((item, index) => {
+      const canvas = document.querySelector(`canvas[data-qr-canvas="${index}"]`)
+      if (canvas) {
+        const qrDataURL = canvas.toDataURL('image/png')
+        labelsHTML += `
+          <div class="label">
+            <div class="item-code">${item.kodeItem}</div>
+            <div class="item-info">${item.namaMaterial}</div>
+            <div class="qr-code">
+              <img src="${qrDataURL}" width="120" height="120">
+            </div>
+            <div class="item-info">Batch: ${item.batchLot}</div>
+            <div class="item-info">Qty: ${item.qtyUnit}</div>
+            <div class="item-info">Exp: ${item.expDate}</div>
+            <div class="item-info">PO: ${selectedShipment.value.noPo}</div>
+          </div>
+        `
+      }
+    })
+    
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>All QR Labels - ${selectedShipment.value.noSuratJalan}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .label { 
+              border: 2px solid #000; 
+              padding: 15px; 
+              width: 300px; 
+              text-align: center; 
+              margin-bottom: 20px;
+              display: inline-block;
+              vertical-align: top;
+            }
+            .qr-code { margin: 10px 0; }
+            .item-info { font-size: 12px; margin: 5px 0; }
+            .item-code { font-weight: bold; font-size: 14px; }
+            @media print {
+              body { margin: 0; }
+              .label { 
+                border: 2px solid #000; 
+                page-break-inside: avoid;
+                margin: 10px;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          ${labelsHTML}
+        </body>
+      </html>
+    `)
+    
+    printWindow.document.close()
+    printWindow.focus()
+    
+    setTimeout(() => {
+      printWindow.print()
+      printWindow.close()
+    }, 500)
+  } else {
+    alert('Tidak ada item untuk dicetak')
+  }
+}
+
+const lanjutQC = (shipment) => {
+  alert(`Melanjutkan ke QC untuk: ${shipment.incomingNumber || shipment.noSuratJalan}`)
+}
+
+// Lifecycle
+onMounted(() => {
+  initDummyData()
+  resetForm()
+})
 </script>

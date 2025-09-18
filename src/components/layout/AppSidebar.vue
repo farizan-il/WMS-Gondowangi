@@ -1,7 +1,7 @@
 <template>
   <aside
     :class="[
-      'fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-99999 border-r border-gray-200',
+      'fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-99 border-r border-gray-200',
       {
         'lg:w-[290px]': isExpanded || isMobileOpen || isHovered,
         'lg:w-[90px]': !isExpanded && !isHovered,
@@ -206,29 +206,29 @@ const menuGroups = [
       {
         icon: GridIcon,
         name: 'Dashboard',
-        subItems: [{ name: 'Ecommerce', path: '/Ecommerce', pro: false }],
+        path: '/Ecommerce',
       },
       // {
       //   icon: CalenderIcon,
       //   name: 'Calendar',
       //   path: '/calendar',
       // },
-      // {
-      //   icon: UserCircleIcon,
-      //   name: 'User Profile',
-      //   path: '/profile',
-      // },
 
       {
         name: 'Forms',
         icon: ListIcon,
-        subItems: [{ name: 'Form Elements', path: '/form-elements', pro: false }],
+         path: '/form-elements',
       },
-      // {
-      //   name: 'Tables',
-      //   icon: TableIcon,
-      //   subItems: [{ name: 'Basic Tables', path: '/basic-tables', pro: false }],
-      // },
+      {
+        name: 'Tables',
+        icon: TableIcon,
+        path: '/basic-tables',
+      },
+      {
+        name: 'User Profile',
+        icon: UserCircleIcon,
+        path: '/profile',
+      },
       // {
       //   name: 'Pages',
       //   icon: PageIcon,
@@ -237,6 +237,11 @@ const menuGroups = [
       //     { name: '404 Page', path: '/error-404', pro: false },
       //   ],
       // },
+      {
+        icon: PieChartIcon,
+        name: 'Charts',
+        path: '/line-chart',
+      },
     ],
   },
   // {
