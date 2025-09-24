@@ -7,7 +7,7 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="mb-6 flex gap-4">
+    <!-- <div class="mb-6 flex gap-4">
       <button
         @click="showCreateModal = true"
         class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium"
@@ -26,7 +26,7 @@
         </svg>
         Generate Auto Putaway
       </button>
-    </div>
+    </div> -->
 
     <!-- Filter & Search -->
     <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
@@ -92,7 +92,7 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TO Number</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Creation Date</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Warehouse</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipe</th>
+              <!-- <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipe</th> -->
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
               <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -110,11 +110,11 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ to.warehouse }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <!-- <td class="px-6 py-4 whitespace-nowrap">
                 <span :class="getTypeClass(to.type)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
                   {{ to.type }}
                 </span>
-              </td>
+              </td> -->
               <td class="px-6 py-4 whitespace-nowrap">
                 <span :class="getStatusClass(to.status)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
                   {{ to.status }}

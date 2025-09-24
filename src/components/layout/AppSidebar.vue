@@ -201,83 +201,88 @@ const { isExpanded, isMobileOpen, isHovered, openSubmenu } = useSidebar()
 
 const menuGroups = [
   {
-    title: 'Menu',
+    title: 'Kelola',
+    items: [
+    //     {
+    //       icon: UserCircleIcon,
+    //       name: 'Kelola Pengguna',
+    //       path: '/avatars'
+    //     },
+        {
+          icon: GridIcon,
+          name: 'Dashboard',
+          path: '/Ecommerce',
+        },
+        {
+          icon: UserCircleIcon,
+          name: 'Central Data',
+          path: '/images',
+        },
+        {
+          icon: PageIcon,
+          name: 'Role Permission',
+          path: '/badge'
+        },
+    //     // {
+    //     //   icon: BoxCubeIcon,
+    //     //   name: 'Ui Elements',
+    //     //   subItems: [
+    //     //     { name: 'Images', path: '/images', pro: false },
+    //     //     { name: 'Videos', path: '/videos', pro: false },
+    //     //   ],
+    //     // },
+    //     // {
+    //     //   icon: PlugInIcon,
+    //     //   name: 'Authentication',
+    //     //   subItems: [
+    //     //     { name: 'Signin', path: '/signin', pro: false },
+    //     //     { name: 'Signup', path: '/signup', pro: false },
+    //     //   ],
+    //     // },
+    //     // ... Add other menu items here
+    ],
+  },
+
+  {
+    title: 'Utama',
     items: [
       {
-        icon: GridIcon,
-        name: 'Dashboard',
-        path: '/Ecommerce',
-      },
-      // {
-      //   icon: CalenderIcon,
-      //   name: 'Calendar',
-      //   path: '/calendar',
-      // },
-
-      {
-        name: 'Forms',
+        name: 'Penerimaan Barang',
         icon: ListIcon,
          path: '/form-elements',
       },
       {
-        name: 'Tables',
+        name: 'Quality Control',
         icon: TableIcon,
         path: '/basic-tables',
       },
       {
-        name: 'User Profile',
-        icon: UserCircleIcon,
+        name: 'Label Karantina',
+        icon: PlugInIcon,
         path: '/profile',
       },
-      // {
-      //   name: 'Pages',
-      //   icon: PageIcon,
-      //   subItems: [
-      //     { name: 'Black Page', path: '/blank', pro: false },
-      //     { name: '404 Page', path: '/error-404', pro: false },
-      //   ],
-      // },
       {
         icon: PieChartIcon,
-        name: 'Charts',
+        name: 'PutAway & Tranfer Order',
         path: '/line-chart',
+      },
+      {
+        icon: PageIcon,
+        name: 'Reservation',
+        path: '/bar-chart',
+      },
+      {
+        icon: BoxCubeIcon,
+        name: 'Picking List',
+        path: '/alerts',
+      },
+      {
+        icon: BoxCubeIcon,
+        name: 'Return',
+        path: '/buttons',
       },
     ],
   },
-  // {
-  //   title: 'Others',
-  //   items: [
-  //     {
-  //       icon: PieChartIcon,
-  //       name: 'Charts',
-  //       subItems: [
-  //         { name: 'Line Chart', path: '/line-chart', pro: false },
-  //         { name: 'Bar Chart', path: '/bar-chart', pro: false },
-  //       ],
-  //     },
-  //     {
-  //       icon: BoxCubeIcon,
-  //       name: 'Ui Elements',
-  //       subItems: [
-  //         { name: 'Alerts', path: '/alerts', pro: false },
-  //         { name: 'Avatars', path: '/avatars', pro: false },
-  //         { name: 'Badge', path: '/badge', pro: false },
-  //         { name: 'Buttons', path: '/buttons', pro: false },
-  //         { name: 'Images', path: '/images', pro: false },
-  //         { name: 'Videos', path: '/videos', pro: false },
-  //       ],
-  //     },
-  //     {
-  //       icon: PlugInIcon,
-  //       name: 'Authentication',
-  //       subItems: [
-  //         { name: 'Signin', path: '/signin', pro: false },
-  //         { name: 'Signup', path: '/signup', pro: false },
-  //       ],
-  //     },
-  //     // ... Add other menu items here
-  //   ],
-  // },
 ]
 
 const isActive = (path) => route.path === path
