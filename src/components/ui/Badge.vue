@@ -226,12 +226,7 @@
             </h4>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
               <label v-for="action in ['View', 'Kerjakan Picking', 'Cetak Picking List']" :key="`picking-${action}`" class="flex items-center">
-                <input 
-                  type="checkbox" 
-                  :checked="hasPermission('picking', action.toLowerCase().replace(/ /g, '_'))"
-                  @change="togglePermission('picking', action.toLowerCase().replace(/ /g, '_'), $event)"
-                  class="mr-2"
-                >
+                <input  type="checkbox"  :checked="hasPermission('picking', action.toLowerCase().replace(/ /g, '_'))" @change="togglePermission('picking', action.toLowerCase().replace(/ /g, '_'), $event)" class="mr-2">
                 {{ action }}
               </label>
             </div>
@@ -245,12 +240,7 @@
             </h4>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
               <label v-for="action in ['View', 'Create Return', 'Approve Return', 'Cetak Slip']" :key="`return-${action}`" class="flex items-center">
-                <input 
-                  type="checkbox" 
-                  :checked="hasPermission('return', action.toLowerCase().replace(/ /g, '_'))"
-                  @change="togglePermission('return', action.toLowerCase().replace(/ /g, '_'), $event)"
-                  class="mr-2"
-                >
+                <input type="checkbox" :checked="hasPermission('return', action.toLowerCase().replace(/ /g, '_'))"@change="togglePermission('return', action.toLowerCase().replace(/ /g, '_'), $event)"class="mr-2">
                 {{ action }}
               </label>
             </div>
