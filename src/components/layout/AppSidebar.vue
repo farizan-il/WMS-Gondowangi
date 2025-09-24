@@ -203,20 +203,20 @@ const menuGroups = [
   {
     title: 'Kelola',
     items: [
-    //     {
-    //       icon: UserCircleIcon,
-    //       name: 'Kelola Pengguna',
-    //       path: '/avatars'
-    //     },
-        {
-          icon: GridIcon,
-          name: 'Dashboard',
-          path: '/Ecommerce',
-        },
+        // {
+        //   icon: UserCircleIcon,
+        //   name: 'Kelola Pengguna',
+        //   path: '/avatars'
+        // },
         {
           icon: UserCircleIcon,
           name: 'Central Data',
           path: '/images',
+        },
+        {
+          icon: GridIcon,
+          name: 'Riwayat Aktivitas',
+          path: '/Ecommerce',
         },
         {
           icon: PageIcon,

@@ -115,7 +115,7 @@
                 <span>Export</span>
               </button>
               
-              <button 
+              <!-- <button 
                 @click="openAddModal"
                 class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
               >
@@ -123,7 +123,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
                 <span>Tambah</span>
-              </button>
+              </button> -->
             </div>
           </div>
         </div>
@@ -192,7 +192,7 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                     </svg>
                   </button>
-                  <button 
+                  <!-- <button 
                     @click.stop="reserveItem(item)"
                     class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300 transition-colors"
                     title="Reserve"
@@ -200,7 +200,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                     </svg>
-                  </button>
+                  </button> -->
                 </td>
               </tr>
             </tbody>
@@ -351,22 +351,22 @@
           </div>
 
           <!-- Panel Actions -->
-          <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+          <!-- <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
             <div class="flex space-x-3">
               <button 
                 @click="transferItem(selectedItem)"
                 class="flex-1 px-3 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
               >
-                Transfer
+                Button A
               </button>
               <button 
                 @click="reserveItem(selectedItem)"
                 class="flex-1 px-3 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition-colors"
               >
-                Reserve
+                Button Y
               </button>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
 
