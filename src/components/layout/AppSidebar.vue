@@ -214,6 +214,11 @@ const menuGroups = [
           path: '/images',
         },
         {
+          name: 'Master Data',
+          icon: PlugInIcon,
+          path: '/profile',
+        },
+        {
           icon: GridIcon,
           name: 'Riwayat Aktivitas',
           path: '/Ecommerce',
@@ -257,11 +262,6 @@ const menuGroups = [
         path: '/basic-tables',
       },
       {
-        name: 'Label Karantina',
-        icon: PlugInIcon,
-        path: '/profile',
-      },
-      {
         icon: PieChartIcon,
         name: 'PutAway & Tranfer Order',
         path: '/line-chart',
@@ -277,7 +277,7 @@ const menuGroups = [
         path: '/alerts',
       },
       {
-        icon: BoxCubeIcon,
+        icon: PlugInIcon,
         name: 'Return',
         path: '/buttons',
       },

@@ -152,7 +152,7 @@
 
             <!-- Raw Material: No Bets -->
             <div v-if="activeTab === 'raw-material'">
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No Bets Ekstrak / Mixing / Filling</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No Bets Ekstrak / Mixing</label>
               <input v-model="formData.noBets" type="text" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
             </div>
 
@@ -183,7 +183,7 @@
                     <!-- FOH & RS Headers -->
                     <template v-if="activeTab === 'foh-rs'">
                       <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Kode Item</th>
-                      <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Serial Number</th>
+                      
                       <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Keterangan</th>
                       <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Qty</th>
                       <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">UoM</th>
@@ -194,7 +194,7 @@
                       <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Nama Material</th>
                       <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Kode PM</th>
                       <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Jumlah Permintaan</th>
-                      <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Serial Number</th>
+                      
                     </template>
 
                     <!-- Raw Material Headers -->
@@ -203,7 +203,7 @@
                       <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Nama Bahan</th>
                       <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Jumlah Kebutuhan</th>
                       <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Jumlah Kirim</th>
-                      <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Serial Number</th>
+                      
                     </template>
 
                     <!-- ADD Headers -->
@@ -212,7 +212,7 @@
                       <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Kode PM</th>
                       <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Alasan Penambahan</th>
                       <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Jumlah Permintaan</th>
-                      <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Serial Number</th>
+                      
                     </template>
 
                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Aksi</th>
@@ -631,9 +631,7 @@ const printForm = (request) => {
         </div>
         
         <table class="items-table">
-          <tr>
-            <th>No</th><th>Kode Item</th><th>Serial Number</th><th>Keterangan</th><th>Qty</th><th>UoM</th>
-          </tr>
+          
           ${request.items.map((item, idx) => `
             <tr>
               <td>${idx + 1}</td>
@@ -663,9 +661,7 @@ const printForm = (request) => {
         </div>
         
         <table class="items-table">
-          <tr>
-            <th>No</th><th>Nama Material</th><th>Kode PM</th><th>Jumlah Permintaan</th><th>Serial Number</th>
-          </tr>
+          
           ${request.items.map((item, idx) => `
             <tr>
               <td>${idx + 1}</td>
@@ -697,9 +693,7 @@ const printForm = (request) => {
         </div>
         
         <table class="items-table">
-          <tr>
-            <th>No</th><th>Kode Bahan</th><th>Nama Bahan</th><th>Jumlah Kebutuhan</th><th>Jumlah Kirim</th><th>Serial Number</th>
-          </tr>
+          
           ${request.items.map((item, idx) => `
             <tr>
               <td>${idx + 1}</td>
@@ -729,9 +723,7 @@ const printForm = (request) => {
         </div>
         
         <table class="items-table">
-          <tr>
-            <th>No</th><th>Nama Material</th><th>Kode PM</th><th>Alasan Penambahan</th><th>Jumlah Permintaan</th><th>Serial Number</th>
-          </tr>
+          
           ${request.items.map((item, idx) => `
             <tr>
               <td>${idx + 1}</td>

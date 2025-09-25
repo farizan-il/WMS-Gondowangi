@@ -45,8 +45,8 @@
                 <div class="flex space-x-2">
                   <button @click="viewDetail(shipment)" class="bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-800 px-2 py-1 rounded text-xs">Detail</button>
                   <button @click="printChecklist(shipment)" class="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800 px-2 py-1 rounded text-xs">Cetak Checklist</button>
+                  <button @click="printFinanceSlip(shipment)" class="bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800 px-2 py-1 rounded text-xs">Cetak Finance</button>
                   <button @click="showQRModal(shipment)" class="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 px-2 py-1 rounded text-xs">Cetak Label QR</button>
-                  <button v-if="shipment.status === 'Arrived'" @click="lanjutQC(shipment)" class="bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-800 px-2 py-1 rounded text-xs">Lanjut QC</button>
                 </div>
               </td>
             </tr>
@@ -134,7 +134,7 @@
             </div>
 
             <div class="overflow-x-auto border border-gray-200 dark:border-gray-600 rounded-lg">
-              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600" style="min-width: 1200px;">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600" style="min-width: 1400px;">
                 <thead class="bg-gray-50 dark:bg-gray-700">
                   <tr>
                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Kode Item</th>
@@ -146,6 +146,8 @@
                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Kondisi</th>
                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">CoA</th>
                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Label Mfg</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Label & CoA Sesuai</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Pabrik Pembuat</th>
                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Status QC</th>
                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Aksi</th>
                   </tr>
@@ -174,25 +176,31 @@
                       <input v-model="item.qtyUnit" type="number" class="w-24 text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                     </td>
                     <td class="px-3 py-2 whitespace-nowrap">
-                      <select v-model="item.kondisi" class="w-28 text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                        <option value="">Pilih</option>
-                        <option value="Baik">Baik</option>
-                        <option value="Tidak Baik">Tidak Baik</option>
-                      </select>
+                      <div class="flex gap-1">
+                        <button @click="toggleCheckbox(item, 'kondisiBaik')" :class="[item.kondisiBaik ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700', 'px-2 py-1 text-xs rounded']">Baik</button>
+                        <button @click="toggleCheckbox(item, 'kondisiTidakBaik')" :class="[item.kondisiTidakBaik ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700', 'px-2 py-1 text-xs rounded']">Tidak Baik</button>
+                      </div>
                     </td>
                     <td class="px-3 py-2 whitespace-nowrap">
-                      <select v-model="item.coa" class="w-24 text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                        <option value="">Pilih</option>
-                        <option value="Ada">Ada</option>
-                        <option value="Tidak Ada">Tidak Ada</option>
-                      </select>
+                      <div class="flex gap-1">
+                        <button @click="toggleCheckbox(item, 'coaAda')" :class="[item.coaAda ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700', 'px-2 py-1 text-xs rounded']">Ada</button>
+                        <button @click="toggleCheckbox(item, 'coaTidakAda')" :class="[item.coaTidakAda ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700', 'px-2 py-1 text-xs rounded']">Tidak</button>
+                      </div>
                     </td>
                     <td class="px-3 py-2 whitespace-nowrap">
-                      <select v-model="item.labelMfg" class="w-24 text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                        <option value="">Pilih</option>
-                        <option value="Ada">Ada</option>
-                        <option value="Tidak Ada">Tidak Ada</option>
-                      </select>
+                      <div class="flex gap-1">
+                        <button @click="toggleCheckbox(item, 'labelMfgAda')" :class="[item.labelMfgAda ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700', 'px-2 py-1 text-xs rounded']">Ada</button>
+                        <button @click="toggleCheckbox(item, 'labelMfgTidakAda')" :class="[item.labelMfgTidakAda ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700', 'px-2 py-1 text-xs rounded']">Tidak</button>
+                      </div>
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <div class="flex gap-1">
+                        <button @click="toggleCheckbox(item, 'labelCoaSesuai')" :class="[item.labelCoaSesuai ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700', 'px-2 py-1 text-xs rounded']">Ada</button>
+                        <button @click="toggleCheckbox(item, 'labelCoaTidakSesuai')" :class="[item.labelCoaTidakSesuai ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700', 'px-2 py-1 text-xs rounded']">Tidak</button>
+                      </div>
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <input v-model="item.pabrikPembuat" type="text" class="w-32 text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Nama pabrik">
                     </td>
                     <td class="px-3 py-2 whitespace-nowrap">
                       <span class="text-sm text-gray-600 dark:text-gray-400">{{ item.statusQC }}</span>
@@ -220,7 +228,7 @@
     </div>
 
     <!-- Modal QR Code -->
-    <div v-if="showQRCodeModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[9999]" style="background-color: #2b333fab;"0>
+    <div v-if="showQRCodeModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[9999]" style="background-color: #2b333fab;">
       <div class="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
         <div class="p-6">
           <!-- Header Modal QR -->
@@ -325,12 +333,18 @@ const shipments = ref([])
 
 // Data dummy untuk dropdown
 const dummyPOs = ref(['PO-001/2025', 'PO-002/2025', 'PO-003/2025'])
-const dummySuppliers = ref(['PT Supplier A', 'PT Supplier B', 'CV Supplier C'])
+const dummySuppliers = ref([
+  'PT Supplier A',
+  'PT Supplier B', 
+  'CV Supplier C',
+  'Sinar Universal Labelindo,PT'
+])
 const dummySKUs = ref([
-  { code: 'RM-001', name: 'Tepung Terigu' },
-  { code: 'RM-002', name: 'Gula Pasir' },
-  { code: 'PM-001', name: 'Kardus Box 20x30' },
-  { code: 'PM-002', name: 'Plastik Wrap' }
+  { code: 'RM-001', name: 'Tepung Terigu', mfg: 'PT Indofood' },
+  { code: 'RM-002', name: 'Gula Pasir', mfg: 'PT Gulaku' },
+  { code: 'PM-001', name: 'Kardus Box 20x30', mfg: 'PT Kemasan Indo' },
+  { code: 'PM-002', name: 'Plastik Wrap', mfg: 'PT Plastik Jaya' },
+  { code: '23412', name: 'Sticker Botol Natur Natural Extract Hair Tonic Aloe Vera Extract 90 ML - Redesign', mfg: 'Sinar Universal Labelindo' }
 ])
 
 // Form data
@@ -350,59 +364,69 @@ const initDummyData = () => {
   shipments.value = [
     {
       id: 1,
-      noPo: 'PO-001/2025',
-      noSuratJalan: 'SJ-001/2025',
-      supplier: 'PT Supplier A',
-      tanggalTerima: '2025-09-18T10:30:00',
-      noKendaraan: 'B 1234 CD',
-      status: 'Arrived',
+      incomingNumber: 'IN/26760',
+      noPo: 'PO62860',
+      noSuratJalan: 'LBL202501532',
+      supplier: 'Sinar Universal Labelindo,PT',
+      tanggalTerima: '2025-08-27T14:50:06',
+      noKendaraan: 'B 2222 FFF',
+      namaDriver: 'Anton S',
+      status: 'Karantina',
+      kategori: 'Packaging Material',
       items: [
         {
-          kodeItem: 'RM-001',
-          namaMaterial: 'Tepung Terigu',
+          kodeItem: '23412',
+          namaMaterial: 'Sticker Botol Natur Natural Extract Hair Tonic Aloe Vera Extract 90 ML - Redesign',
           batchLot: 'BATCH001',
           expDate: '2025-12-31',
-          qtyUnit: '50',
-          qrCode: 'IN/20250918/0001|RM-001|BATCH001|50|2025-12-31'
-        },
-        {
-          kodeItem: 'PM-001',
-          namaMaterial: 'Kardus Box 20x30',
-          batchLot: 'BATCH002',
-          expDate: '2026-06-30',
-          qtyUnit: '100',
-          qrCode: 'IN/20250918/0001|PM-001|BATCH002|100|2026-06-30'
+          qtyWadah: '10',
+          qtyUnit: '20000',
+          pabrikPembuat: 'Sinar Universal Labelindo',
+          kondisiBaik: true,
+          kondisiTidakBaik: false,
+          coaAda: true,
+          coaTidakAda: false,
+          labelMfgAda: true,
+          labelMfgTidakAda: false,
+          labelCoaSesuai: true,
+          labelCoaTidakSesuai: false,
+          statusQC: 'To QC',
+          qrCode: 'IN/26760|23412|BATCH001|20000|2025-12-31'
         }
       ]
     },
     {
       id: 2,
+      incomingNumber: 'IN/20250918/0002',
       noPo: 'PO-002/2025',
       noSuratJalan: 'SJ-002/2025',
       supplier: 'PT Supplier B',
       tanggalTerima: '2025-09-17T14:15:00',
       noKendaraan: 'B 5678 EF',
-      status: 'QC',
+      namaDriver: 'Budi Santoso',
+      status: 'Karantina',
+      kategori: 'Raw Material',
       items: [
         {
           kodeItem: 'RM-002',
           namaMaterial: 'Gula Pasir',
           batchLot: 'BATCH003',
           expDate: '2025-11-15',
+          qtyWadah: '5',
           qtyUnit: '25',
-          qrCode: 'IN/20250917/0001|RM-002|BATCH003|25|2025-11-15'
+          pabrikPembuat: 'PT Gulaku',
+          kondisiBaik: true,
+          kondisiTidakBaik: false,
+          coaAda: false,
+          coaTidakAda: true,
+          labelMfgAda: true,
+          labelMfgTidakAda: false,
+          labelCoaSesuai: false,
+          labelCoaTidakSesuai: true,
+          statusQC: 'To QC',
+          qrCode: 'IN/20250917/0002|RM-002|BATCH003|25|2025-11-15'
         }
       ]
-    },
-    {
-      id: 3,
-      noPo: 'PO-003/2025',
-      noSuratJalan: 'SJ-003/2025',
-      supplier: 'CV Supplier C',
-      tanggalTerima: '2025-09-16T09:45:00',
-      noKendaraan: 'B 9012 GH',
-      status: 'Completed',
-      items: []
     }
   ]
 }
@@ -449,9 +473,15 @@ const addNewItem = () => {
     expDate: '',
     qtyWadah: '',
     qtyUnit: '',
-    kondisi: '',
-    coa: '',
-    labelMfg: '',
+    pabrikPembuat: '',
+    kondisiBaik: false,
+    kondisiTidakBaik: false,
+    coaAda: false,
+    coaTidakAda: false,
+    labelMfgAda: false,
+    labelMfgTidakAda: false,
+    labelCoaSesuai: false,
+    labelCoaTidakSesuai: false,
     statusQC: 'To QC'
   })
 }
@@ -460,10 +490,31 @@ const removeItem = (index) => {
   newShipment.value.items.splice(index, 1)
 }
 
+const toggleCheckbox = (item, field) => {
+  // Reset all related checkboxes first
+  if (field === 'kondisiBaik' || field === 'kondisiTidakBaik') {
+    item.kondisiBaik = false
+    item.kondisiTidakBaik = false
+  } else if (field === 'coaAda' || field === 'coaTidakAda') {
+    item.coaAda = false
+    item.coaTidakAda = false
+  } else if (field === 'labelMfgAda' || field === 'labelMfgTidakAda') {
+    item.labelMfgAda = false
+    item.labelMfgTidakAda = false
+  } else if (field === 'labelCoaSesuai' || field === 'labelCoaTidakSesuai') {
+    item.labelCoaSesuai = false
+    item.labelCoaTidakSesuai = false
+  }
+  
+  // Set the clicked one to true
+  item[field] = true
+}
+
 const updateNamaMaterial = (index) => {
   const selectedSKU = dummySKUs.value.find(sku => sku.code === newShipment.value.items[index].kodeItem)
   if (selectedSKU) {
     newShipment.value.items[index].namaMaterial = selectedSKU.name
+    newShipment.value.items[index].pabrikPembuat = selectedSKU.mfg
     // Auto set status QC based on SKU type
     if (selectedSKU.code.startsWith('RM-')) {
       newShipment.value.items[index].statusQC = 'To QC'
@@ -490,7 +541,7 @@ const saveShipment = () => {
     noKendaraan: newShipment.value.noKendaraan,
     namaDriver: newShipment.value.namaDriver,
     kategori: newShipment.value.kategori,
-    status: 'Arrived',
+    status: 'Karantina', // Status otomatis karantina
     items: newShipment.value.items.map(item => ({
       ...item,
       qrCode: generateQR(incomingNumber, item.kodeItem, item.batchLot, item.qtyUnit, item.expDate)
@@ -518,11 +569,29 @@ const formatDate = (dateString) => {
   })
 }
 
+const formatDateOnly = (dateString) => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('id-ID', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  })
+}
+
+const formatTime = (dateString) => {
+  const date = new Date(dateString)
+  return date.toLocaleTimeString('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
 const getStatusClass = (status) => {
   const classes = {
     'Draft': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+    'Karantina': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
     'Arrived': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-    'QC': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+    'QC': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
     'Completed': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
   }
   return classes[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
@@ -534,7 +603,345 @@ const viewDetail = (shipment) => {
 }
 
 const printChecklist = (shipment) => {
-  alert(`Mencetak checklist untuk: ${shipment.incomingNumber || shipment.noSuratJalan}`)
+  // Create print window with checklist form
+  const printWindow = window.open('', '_blank')
+  
+  let itemsHTML = ''
+  shipment.items.forEach((item, index) => {
+    const wadahStart = index * parseInt(item.qtyWadah || '1') + 1
+    const wadahEnd = wadahStart + parseInt(item.qtyWadah || '1') - 1
+    
+    itemsHTML += `
+      <tr style="border: 1px solid #000; page-break-inside: avoid;">
+        <td style="border: 1px solid #000; padding: 8px; text-align: center;">${wadahStart}${wadahEnd !== wadahStart ? `-${wadahEnd}` : ''}</td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center;">
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <div>
+              <span>Bersih, utuh, tidak sobek/penyok, dll</span><br>
+              <span>${item.kondisiBaik ? '✓' : '-'}</span>
+            </div>
+            <div>
+              <span>Kotor (potensi kotor sampai kedalam)</span><br>
+              <span>${item.kondisiTidakBaik ? '✓' : '-'}</span>
+            </div>
+            <div>
+              <span>Sobek</span><br>
+              <span>-</span>
+            </div>
+            <div>
+              <span>Penyok yang mempengaruhi material</span><br>
+              <span>-</span>
+            </div>
+          </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center;">
+          <div>Ada: ${item.labelMfgAda ? '✓' : '-'}</div>
+          <div>Tidak: ${item.labelMfgTidakAda ? '✓' : '-'}</div>
+        </td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center;">PCS</td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center;">N/A</td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center;">N/A</td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center;">${item.qtyUnit}</td>
+      </tr>
+    `
+  })
+  
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>Form Checklist Penerimaan Material - ${shipment.noSuratJalan}</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; font-size: 12px; }
+          .header { text-align: center; margin-bottom: 20px; }
+          .form-info { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+          .form-group { margin-bottom: 10px; }
+          .form-group label { font-weight: bold; }
+          .checkbox-group { display: inline-flex; gap: 10px; }
+          table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+          th, td { border: 1px solid #000; padding: 5px; text-align: left; }
+          th { background-color: #f0f0f0; font-weight: bold; text-align: center; }
+          .signature-section { display: flex; justify-content: space-between; margin-top: 30px; }
+          .signature-box { border: 1px solid #000; padding: 20px; width: 200px; text-align: center; }
+          @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div><strong>No. Dok : GF1001-03</strong></div>
+          <div><strong>Rev : 00</strong></div>
+          <h2>E-FORM CHECKLIST PENERIMAAN MATERIAL DARI VENDOR</h2>
+          <div><strong>( ${shipment.incomingNumber || 'No Form Checklist'} )</strong></div>
+        </div>
+        
+        <div class="form-info">
+          <div>
+            <div class="form-group">
+              <label>Kode Item :</label> ${shipment.items[0]?.kodeItem || ''}
+            </div>
+            <div class="form-group">
+              <label>Nama Material :</label> ${shipment.items[0]?.namaMaterial || ''}
+            </div>
+            <div class="form-group">
+              <label>Label dari Mfg* :</label>
+              <span class="checkbox-group">
+                Ada ${shipment.items[0]?.labelMfgAda ? '✓' : '☐'} / Tidak ${shipment.items[0]?.labelMfgTidakAda ? '✓' : '☐'}
+              </span>
+            </div>
+            <div class="form-group">
+              <label>Label & CoA sesuai :</label>
+              <span class="checkbox-group">
+                Ada ${shipment.items[0]?.labelCoaSesuai ? '✓' : '☐'} / Tidak ${shipment.items[0]?.labelCoaTidakSesuai ? '✓' : '☐'}
+              </span>
+            </div>
+            <div class="form-group">
+              <label>Pabrik Pembuat (mfg)* :</label> ${shipment.items[0]?.pabrikPembuat || ''}
+            </div>
+            <div class="form-group">
+              <label>Produksi di negara* :</label> Indonesia
+            </div>
+          </div>
+          <div>
+            <div class="form-group">
+              <label>Supplier :</label> ${shipment.supplier}
+            </div>
+            <div class="form-group">
+              <label>No. PO :</label> ${shipment.noPo}
+            </div>
+            <div class="form-group">
+              <label>No. Surat Jalan :</label> ${shipment.noSuratJalan}
+            </div>
+            <div class="form-group">
+              <label>Mfg. Batch :</label> ${shipment.items[0]?.batchLot || ''}
+            </div>
+            <div class="form-group">
+              <label>ED :</label> ${shipment.items[0]?.expDate || ''}
+            </div>
+            <div class="form-group">
+              <label>CoA :</label>
+              <span class="checkbox-group">
+                Ada ${shipment.items[0]?.coaAda ? '✓' : '☐'} / Tidak ${shipment.items[0]?.coaTidakAda ? '✓' : '☐'}
+              </span>
+            </div>
+            <div class="form-group">
+              <label>Jumlah Wadah :</label> ${shipment.items[0]?.qtyWadah || ''}
+            </div>
+            <div class="form-group">
+              <label>Tgl. Diterima :</label> ${formatDateOnly(shipment.tanggalTerima)}
+              Start : ${formatTime(shipment.tanggalTerima)} WIB End : _____ WIB
+            </div>
+            <div class="form-group">
+              <label>Kategori :</label> ${shipment.kategori || ''}
+            </div>
+            <div class="form-group">
+              <label>Nama Driver :</label> ${shipment.namaDriver}
+            </div>
+            <div class="form-group">
+              <label>No Kendaraan :</label> ${shipment.noKendaraan}
+            </div>
+          </div>
+        </div>
+        
+        <table>
+          <thead>
+            <tr>
+              <th>Wadah Ke-</th>
+              <th style="width: 300px;">Kemasan</th>
+              <th>Label</th>
+              <th>Unit</th>
+              <th>Bruto</th>
+              <th>Tara</th>
+              <th>Netto</th>
+            </tr>
+            <tr>
+              <th></th>
+              <th>
+                <div style="display: flex; justify-content: space-around;">
+                  <span>BAIK</span>
+                  <span>TIDAK BAIK</span>
+                </div>
+              </th>
+              <th>
+                <div>Ada</div>
+                <div>Tidak</div>
+              </th>
+              <th>Jumlah</th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemsHTML}
+          </tbody>
+        </table>
+        
+        <div class="signature-section">
+          <div class="signature-box">
+            <div><strong>Dilaporkan oleh</strong></div>
+            <br><br><br>
+            <div>Nama :</div>
+            <div>Tanggal :</div>
+          </div>
+          <div class="signature-box">
+            <div><strong>Diperiksa Oleh</strong></div>
+            <br><br><br>
+            <div>Nama :</div>
+            <div>Tanggal :</div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 20px; font-size: 10px;">
+          <em>*khusus untuk bahan baku</em>
+        </div>
+        
+        <div class="no-print" style="margin-top: 20px; text-align: center;">
+          <button onclick="window.print()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Print</button>
+          <button onclick="window.close()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">Close</button>
+        </div>
+      </body>
+    </html>
+  `)
+  
+  printWindow.document.close()
+  printWindow.focus()
+}
+
+const printFinanceSlip = (shipment) => {
+  // Create print window with finance slip
+  const printWindow = window.open('', '_blank')
+  
+  let itemsHTML = ''
+  shipment.items.forEach((item) => {
+    itemsHTML += `
+      <tr>
+        <td style="border: 1px solid #000; padding: 8px;">${item.kodeItem}</td>
+        <td style="border: 1px solid #000; padding: 8px;">${item.namaMaterial}</td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: right;">${item.qtyUnit}</td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center;">Pcs</td>
+      </tr>
+    `
+  })
+  
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>Good Receipt Slip - ${shipment.noSuratJalan}</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; font-size: 12px; }
+          .letterhead { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 15px; }
+          .company-info { margin-bottom: 10px; }
+          .addresses { display: flex; justify-content: space-between; margin: 20px 0; }
+          .address-box { border: 1px solid #000; padding: 15px; width: 45%; }
+          .shipment-info { margin: 20px 0; }
+          .shipment-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+          .shipment-table th, .shipment-table td { border: 1px solid #000; padding: 5px; }
+          .shipment-table th { background-color: #f0f0f0; font-weight: bold; text-align: center; }
+          .items-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+          .items-table th, .items-table td { border: 1px solid #000; padding: 8px; }
+          .items-table th { background-color: #f0f0f0; font-weight: bold; text-align: center; }
+          .signature-section { display: flex; justify-content: space-between; margin-top: 40px; }
+          .signature-box { text-align: center; width: 200px; }
+          @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="letterhead">
+          <div class="company-info">
+            <strong>PT. Gondowangi Tradisional Kosmetika</strong><br>
+            JL. JABABEKA BLOK U NO. 29-C<br>
+            RT/RW:03/03 KARANG BARU<br>
+            BEKASI<br>
+            Indonesia<br>
+            Phone: (021) 8910 7915 - 17 | Fax: (021) 8910 7919 | Website: www.gondowangi.com<br>
+            Contact : Reza Rizky - Page: 1
+          </div>
+        </div>
+        
+        <div class="addresses">
+          <div class="address-box">
+            <strong>Supplier Address :</strong><br>
+            ${shipment.supplier}<br>
+            Jl. Satria Raya II No. 32 RT 05 RW 09 Margahayu<br>
+            Utara-Babakan Ciparay<br>
+            Bandung<br>
+            Indonesia
+          </div>
+          <div class="address-box">
+            <strong>Contact Address :</strong><br>
+            +62.22.5417871
+          </div>
+        </div>
+        
+        <div class="shipment-info">
+          <strong>Incoming Shipment : ${shipment.incomingNumber}</strong>
+        </div>
+        
+        <table class="shipment-table">
+          <tr>
+            <th>No SJ</th>
+            <th>Order(Origin)</th>
+            <th>Date</th>
+            <th>Input by</th>
+            <th>No Truck</th>
+            <th>Driver Name</th>
+          </tr>
+          <tr>
+            <td>${shipment.noSuratJalan}</td>
+            <td>${shipment.noPo}</td>
+            <td>${formatDate(shipment.tanggalTerima)}</td>
+            <td>Dita A.P</td>
+            <td>${shipment.noKendaraan}</td>
+            <td>${shipment.namaDriver}</td>
+          </tr>
+        </table>
+        
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Description</th>
+              <th>Quantity</th>
+              <th>UoM</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemsHTML}
+          </tbody>
+        </table>
+        
+        <div class="signature-section">
+          <div class="signature-box">
+            <strong>Approved By,</strong><br><br><br><br>
+            <div style="border-top: 1px solid #000; padding-top: 5px;">
+              Reza Rizky<br>
+              DD/MM/YYYY
+            </div>
+          </div>
+          <div class="signature-box">
+            <strong>Received By,</strong><br><br><br><br>
+            <div style="border-top: 1px solid #000; padding-top: 5px;">
+              Permadi Rohiman<br>
+              DD/MM/YYYY
+            </div>
+          </div>
+        </div>
+        
+        <div class="no-print" style="margin-top: 20px; text-align: center;">
+          <button onclick="window.print()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Print</button>
+          <button onclick="window.close()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">Close</button>
+        </div>
+      </body>
+    </html>
+  `)
+  
+  printWindow.document.close()
+  printWindow.focus()
 }
 
 const showQRModal = (shipment) => {
@@ -730,10 +1137,6 @@ const printAllQR = () => {
   } else {
     alert('Tidak ada item untuk dicetak')
   }
-}
-
-const lanjutQC = (shipment) => {
-  alert(`Melanjutkan ke QC untuk: ${shipment.incomingNumber || shipment.noSuratJalan}`)
 }
 
 // Lifecycle

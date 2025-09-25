@@ -6,27 +6,18 @@
       <p class="text-gray-600">Kelola Transfer Order untuk putaway, transfer, dan picking barang</p>
     </div>
 
-    <!-- Action Buttons -->
-    <!-- <div class="mb-6 flex gap-4">
+    <!-- Auto Generate Putaway Button -->
+    <div class="mb-6">
       <button
-        @click="showCreateModal = true"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium"
+        @click="generateAutoPutaway"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
         </svg>
-        Buat TO Manual
+        Generate Auto Putaway dari QC Released
       </button>
-      <button
-        @click="generateAutoPutaway"
-        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium"
-      >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-        </svg>
-        Generate Auto Putaway
-      </button>
-    </div> -->
+    </div>
 
     <!-- Filter & Search -->
     <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
@@ -47,9 +38,11 @@
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Semua Tipe</option>
-            <option value="Putaway">Putaway</option>
-            <option value="Transfer">Transfer</option>
-            <option value="Picking">Picking</option>
+            <option value="Putaway - QC Release">Putaway - QC Release</option>
+            <option value="Transfer - Internal">Transfer - Internal</option>
+            <option value="Transfer - Bin to Bin">Transfer - Bin to Bin</option>
+            <option value="Picking - Production">Picking - Production</option>
+            <option value="Picking - Sales Order">Picking - Sales Order</option>
           </select>
         </div>
         <div>
@@ -92,7 +85,7 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TO Number</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Creation Date</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Warehouse</th>
-              <!-- <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipe</th> -->
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipe</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
               <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -110,11 +103,11 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ to.warehouse }}
               </td>
-              <!-- <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-6 py-4 whitespace-nowrap">
                 <span :class="getTypeClass(to.type)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
                   {{ to.type }}
                 </span>
-              </td> -->
+              </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span :class="getStatusClass(to.status)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
                   {{ to.status }}
@@ -162,49 +155,156 @@
       </div>
     </div>
 
-    <!-- Create TO Modal -->
-    <div v-if="showCreateModal" class="fixed inset-0 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[9999]" style="background-color: rgba(43, 51, 63, 0.67);">
-      <div class="bg-white rounded-lg p-6 w-full max-w-md">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold">Buat Transfer Order Manual</h3>
-          <button @click="showCreateModal = false" class="text-gray-400 hover:text-gray-600">
+    <!-- Auto Putaway Generation Modal -->
+    <div v-if="showAutoPutawayModal" class="fixed inset-0 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[9999]" style="background-color: rgba(43, 51, 63, 0.67);">
+      <div class="bg-white rounded-lg p-6 w-full max-w-4xl max-h-screen overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-lg font-semibold">Generate Auto Putaway dari QC Released</h3>
+          <button @click="showAutoPutawayModal = false" class="text-gray-400 hover:text-gray-600">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
         </div>
-        
-        <form @submit.prevent="createManualTO">
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Tipe Transfer</label>
-              <select v-model="newTO.type" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="Transfer">Transfer</option>
-                <option value="Picking">Picking</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Warehouse</label>
-              <select v-model="newTO.warehouse" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="WH-001">WH-001 - Gudang Utama</option>
-                <option value="WH-002">WH-002 - Gudang Karantina</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">No Reservasi (Optional)</label>
-              <input v-model="newTO.reservationNo" type="text" placeholder="RSV-2024-001" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+        <div class="space-y-6">
+          <!-- QC Released Materials -->
+          <div>
+            <h4 class="text-md font-medium text-gray-900 mb-3">Material yang sudah QC Released</h4>
+            <div class="overflow-x-auto">
+              <table class="w-full border border-gray-200 rounded-lg">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Select</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item Code</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Material Name</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Current Bin</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">UoM</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Destination</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr v-for="(material, index) in qcReleasedMaterials" :key="index" class="hover:bg-gray-50">
+                    <td class="px-4 py-3">
+                      <input
+                        type="checkbox"
+                        v-model="material.selected"
+                        class="rounded border-gray-300 focus:ring-blue-500"
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">{{ material.itemCode }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">{{ material.materialName }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">{{ material.currentBin }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">{{ material.qty }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">{{ material.uom }}</td>
+                    <td class="px-4 py-3">
+                      <div class="flex items-center gap-2">
+                        <select
+                          v-model="material.destinationBin"
+                          class="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          :disabled="!material.selected"
+                        >
+                          <option value="">Pilih Bin</option>
+                          <option v-for="bin in getAvailableBins(material.itemCode)" :key="bin.code" :value="bin.code">
+                            {{ bin.code }} ({{ bin.currentItems }} items)
+                          </option>
+                        </select>
+                        <button
+                          @click="showBinDetails(material)"
+                          class="text-blue-600 hover:text-blue-800 text-xs"
+                          title="Lihat detail bin"
+                        >
+                          Info
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-          
-          <div class="flex gap-3 mt-6">
-            <button type="button" @click="showCreateModal = false" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50">
+
+          <div class="flex gap-3 justify-end">
+            <button @click="showAutoPutawayModal = false" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50">
               Batal
             </button>
-            <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-              Buat TO
+            <button
+              @click="confirmAutoPutaway"
+              :disabled="!selectedMaterials.length"
+              :class="selectedMaterials.length ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
+              class="px-4 py-2 text-white rounded-md font-medium"
+            >
+              Generate Putaway TO ({{ selectedMaterials.length }} items)
             </button>
           </div>
-        </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bin Details Modal -->
+    <div v-if="showBinModal" class="fixed inset-0 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[9999]" style="background-color: rgba(43, 51, 63, 0.67);">
+      <div class="bg-white rounded-lg p-6 w-full max-w-2xl">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold">Detail Bin: {{ selectedBinInfo?.code }}</h3>
+          <button @click="showBinModal = false" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div v-if="selectedBinInfo" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Bin Code</label>
+              <p class="text-sm text-gray-900 mt-1">{{ selectedBinInfo.code }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Warehouse</label>
+              <p class="text-sm text-gray-900 mt-1">{{ selectedBinInfo.warehouse }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Zone</label>
+              <p class="text-sm text-gray-900 mt-1">{{ selectedBinInfo.zone }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Capacity</label>
+              <p class="text-sm text-gray-900 mt-1">{{ selectedBinInfo.capacity }}</p>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Current Materials</label>
+            <div class="max-h-40 overflow-y-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-3 py-2 text-left">Material</th>
+                    <th class="px-3 py-2 text-left">Qty</th>
+                    <th class="px-3 py-2 text-left">UoM</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="material in selectedBinInfo.materials" :key="material.itemCode" class="border-t">
+                    <td class="px-3 py-2">{{ material.materialName }}</td>
+                    <td class="px-3 py-2">{{ material.qty }}</td>
+                    <td class="px-3 py-2">{{ material.uom }}</td>
+                  </tr>
+                  <tr v-if="!selectedBinInfo.materials.length" class="border-t">
+                    <td colspan="3" class="px-3 py-2 text-gray-500 text-center">Bin kosong</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end mt-6">
+          <button @click="showBinModal = false" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
+            Tutup
+          </button>
+        </div>
       </div>
     </div>
 
@@ -407,37 +507,58 @@ interface TransferOrder {
   toNumber: string
   creationDate: Date
   warehouse: string
-  type: 'Putaway' | 'Transfer' | 'Picking'
+  type: string
   status: 'Pending' | 'In Progress' | 'Completed'
   reservationNo?: string
   items: TOItem[]
   isExecuting?: boolean
 }
 
+interface QCReleasedMaterial {
+  itemCode: string
+  materialName: string
+  currentBin: string
+  qty: number
+  uom: string
+  selected: boolean
+  destinationBin: string
+}
+
+interface BinInfo {
+  code: string
+  warehouse: string
+  zone: string
+  capacity: string
+  currentItems: number
+  materials: Array<{
+    itemCode: string
+    materialName: string
+    qty: number
+    uom: string
+  }>
+}
+
 // Reactive data
 const transferOrders = ref<TransferOrder[]>([])
+const qcReleasedMaterials = ref<QCReleasedMaterial[]>([])
+const binData = ref<BinInfo[]>([])
 const searchQuery = ref('')
 const filterType = ref('')
 const filterStatus = ref('')
 const filterWarehouse = ref('')
 
 // Modals
-const showCreateModal = ref(false)
+const showAutoPutawayModal = ref(false)
+const showBinModal = ref(false)
 const showDetailModal = ref(false)
 const showQRModal = ref(false)
 
 // Selected data
 const selectedTO = ref<TransferOrder | null>(null)
+const selectedBinInfo = ref<BinInfo | null>(null)
 const currentItem = ref<TOItem | null>(null)
 const qrScanType = ref('')
 const qrInput = ref('')
-
-// Form data
-const newTO = ref({
-  type: 'Transfer',
-  warehouse: 'WH-001',
-  reservationNo: ''
-})
 
 // Computed
 const filteredTransferOrders = computed(() => {
@@ -449,6 +570,10 @@ const filteredTransferOrders = computed(() => {
     
     return matchesSearch && matchesType && matchesStatus && matchesWarehouse
   })
+})
+
+const selectedMaterials = computed(() => {
+  return qcReleasedMaterials.value.filter(m => m.selected && m.destinationBin)
 })
 
 const canCompleteTO = computed(() => {
@@ -468,47 +593,112 @@ const generateTONumber = () => {
   return `TO-${year}-${month}-${sequence}`
 }
 
-const createManualTO = () => {
-  const newTransferOrder: TransferOrder = {
+const generateAutoPutaway = () => {
+  // Load QC released materials (simulation)
+  qcReleasedMaterials.value = [
+    {
+      itemCode: 'CHM-001',
+      materialName: 'Sodium Chloride - QC Released',
+      currentBin: 'QTN-A-01',
+      qty: 50,
+      uom: 'KG',
+      selected: false,
+      destinationBin: ''
+    },
+    {
+      itemCode: 'CHM-002',
+      materialName: 'Calcium Carbonate - QC Released',
+      currentBin: 'QTN-A-02',
+      qty: 25,
+      uom: 'KG',
+      selected: false,
+      destinationBin: ''
+    },
+    {
+      itemCode: 'CHM-003',
+      materialName: 'Potassium Hydroxide - QC Released',
+      currentBin: 'QTN-B-01',
+      qty: 15,
+      uom: 'L',
+      selected: false,
+      destinationBin: ''
+    },
+    {
+      itemCode: 'CHM-004',
+      materialName: 'Magnesium Sulfate - QC Released',
+      currentBin: 'QTN-A-03',
+      qty: 30,
+      uom: 'KG',
+      selected: false,
+      destinationBin: ''
+    }
+  ]
+  showAutoPutawayModal.value = true
+}
+
+const getAvailableBins = (itemCode: string) => {
+  // Filter bins based on material type and availability
+  const materialType = itemCode.substring(0, 3)
+  return binData.value.filter(bin => {
+    // Standard storage bins for released materials
+    if (bin.code.startsWith('STD-') || bin.code.startsWith('HAZ-')) {
+      return bin.currentItems < 10 // Assume max 10 items per bin
+    }
+    return false
+  })
+}
+
+const showBinDetails = (material: QCReleasedMaterial) => {
+  if (!material.destinationBin) {
+    alert('Pilih destination bin terlebih dahulu!')
+    return
+  }
+  
+  selectedBinInfo.value = binData.value.find(bin => bin.code === material.destinationBin) || null
+  showBinModal.value = true
+}
+
+const confirmAutoPutaway = () => {
+  if (!selectedMaterials.value.length) {
+    alert('Pilih minimal 1 material untuk di-putaway!')
+    return
+  }
+
+  // Create putaway TO
+  const putawayTO: TransferOrder = {
     id: Date.now().toString(),
     toNumber: generateTONumber(),
     creationDate: new Date(),
-    warehouse: newTO.value.warehouse,
-    type: newTO.value.type as 'Transfer' | 'Picking',
+    warehouse: 'WH-001',
+    type: 'Putaway - QC Release',
     status: 'Pending',
-    reservationNo: newTO.value.reservationNo || undefined,
-    items: [
-      {
-        itemCode: 'CHM-001',
-        materialName: 'Chemical A - Released from Quarantine',
-        sourceBin: 'QTN-A-01',
-        destBin: 'STD-A-02-01',
-        qty: 25,
-        uom: 'KG',
-        status: 'pending',
-        boxScanned: false,
-        sourceBinScanned: false,
-        destBinScanned: false
-      },
-      {
-        itemCode: 'CHM-002',
-        materialName: 'Chemical B - Released from Quarantine',
-        sourceBin: 'QTN-A-02',
-        destBin: 'STD-B-01-03',
-        qty: 15,
-        uom: 'L',
-        status: 'pending',
-        boxScanned: false,
-        sourceBinScanned: false,
-        destBinScanned: false
-      }
-    ]
+    reservationNo: `RSV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
+    items: selectedMaterials.value.map(material => ({
+      itemCode: material.itemCode,
+      materialName: material.materialName,
+      sourceBin: material.currentBin,
+      destBin: material.destinationBin,
+      qty: material.qty,
+      uom: material.uom,
+      status: 'pending' as const,
+      boxScanned: false,
+      sourceBinScanned: false,
+      destBinScanned: false
+    }))
   }
 
-  transferOrders.value.unshift(autoPutaway)
+  transferOrders.value.unshift(putawayTO)
   
-  // Notification
-  alert('Auto Putaway TO berhasil di-generate!')
+  // Update bin data (simulate occupancy increase)
+  selectedMaterials.value.forEach(material => {
+    const bin = binData.value.find(b => b.code === material.destinationBin)
+    if (bin) {
+      bin.currentItems++
+    }
+  })
+
+  showAutoPutawayModal.value = false
+  alert(`Auto Putaway TO ${putawayTO.toNumber} berhasil di-generate dengan ${selectedMaterials.value.length} items!`)
 }
 
 const viewDetail = (to: TransferOrder) => {
@@ -628,6 +818,27 @@ const completeTO = () => {
     console.log(`Stock Transaction:`)
     console.log(`- Reduce ${item.actualQty || item.qty} ${item.uom} from ${item.sourceBin}`)
     console.log(`- Add ${item.actualQty || item.qty} ${item.uom} to ${item.destBin}`)
+    
+    // Update bin occupancy
+    const sourceBin = binData.value.find(bin => bin.code === item.sourceBin)
+    const destBin = binData.value.find(bin => bin.code === item.destBin)
+    
+    if (sourceBin) {
+      sourceBin.currentItems = Math.max(0, sourceBin.currentItems - 1)
+      // Remove material from source bin
+      sourceBin.materials = sourceBin.materials.filter(m => m.itemCode !== item.itemCode)
+    }
+    
+    if (destBin) {
+      destBin.currentItems++
+      // Add material to dest bin
+      destBin.materials.push({
+        itemCode: item.itemCode,
+        materialName: item.materialName,
+        qty: item.actualQty || item.qty,
+        uom: item.uom
+      })
+    }
   })
 
   // Update TO status
@@ -706,9 +917,11 @@ const formatDate = (date: Date) => {
 
 const getTypeClass = (type: string) => {
   const classes = {
-    'Putaway': 'bg-blue-100 text-blue-800',
-    'Transfer': 'bg-green-100 text-green-800',
-    'Picking': 'bg-purple-100 text-purple-800'
+    'Putaway - QC Release': 'bg-blue-100 text-blue-800',
+    'Transfer - Internal': 'bg-green-100 text-green-800',
+    'Transfer - Bin to Bin': 'bg-teal-100 text-teal-800',
+    'Picking - Production': 'bg-purple-100 text-purple-800',
+    'Picking - Sales Order': 'bg-pink-100 text-pink-800'
   }
   return classes[type as keyof typeof classes] || 'bg-gray-100 text-gray-800'
 }
@@ -731,36 +944,86 @@ const getItemStatusClass = (status: string) => {
   return classes[status as keyof typeof classes] || 'bg-gray-100 text-gray-800'
 }
 
-// Initialize dummy data
+// Initialize data
 onMounted(() => {
+  // Initialize bin data
+  binData.value = [
+    {
+      code: 'STD-A-02-01',
+      warehouse: 'WH-001',
+      zone: 'Standard Storage Zone A',
+      capacity: '1000 KG',
+      currentItems: 3,
+      materials: [
+        { itemCode: 'CHM-010', materialName: 'Chemical X', qty: 25, uom: 'KG' },
+        { itemCode: 'CHM-011', materialName: 'Chemical Y', qty: 30, uom: 'KG' }
+      ]
+    },
+    {
+      code: 'STD-A-02-02',
+      warehouse: 'WH-001',
+      zone: 'Standard Storage Zone A',
+      capacity: '800 KG',
+      currentItems: 1,
+      materials: [
+        { itemCode: 'CHM-012', materialName: 'Chemical Z', qty: 50, uom: 'KG' }
+      ]
+    },
+    {
+      code: 'STD-B-01-01',
+      warehouse: 'WH-001',
+      zone: 'Standard Storage Zone B',
+      capacity: '500 L',
+      currentItems: 0,
+      materials: []
+    },
+    {
+      code: 'STD-B-01-02',
+      warehouse: 'WH-001',
+      zone: 'Standard Storage Zone B',
+      capacity: '500 L',
+      currentItems: 2,
+      materials: [
+        { itemCode: 'CHM-013', materialName: 'Liquid A', qty: 100, uom: 'L' }
+      ]
+    },
+    {
+      code: 'HAZ-A-01-01',
+      warehouse: 'WH-002',
+      zone: 'Hazardous Storage Zone A',
+      capacity: '200 L',
+      currentItems: 1,
+      materials: [
+        { itemCode: 'CHM-014', materialName: 'Hazardous Chemical', qty: 50, uom: 'L' }
+      ]
+    },
+    {
+      code: 'HAZ-A-01-02',
+      warehouse: 'WH-002',
+      zone: 'Hazardous Storage Zone A',
+      capacity: '200 L',
+      currentItems: 0,
+      materials: []
+    }
+  ]
+
+  // Initialize dummy TO data
   const dummyData: TransferOrder[] = [
     {
       id: '1',
       toNumber: 'TO-2024-09-001',
       creationDate: new Date('2024-09-18T08:00:00'),
       warehouse: 'WH-001',
-      type: 'Putaway',
+      type: 'Putaway - QC Release',
       status: 'Pending',
       reservationNo: 'RSV-2024-045',
       items: [
         {
           itemCode: 'CHM-001',
-          materialName: 'Sodium Chloride',
+          materialName: 'Sodium Chloride - QC Released',
           sourceBin: 'QTN-A-01',
           destBin: 'STD-A-02-01',
           qty: 50,
-          uom: 'KG',
-          status: 'pending',
-          boxScanned: false,
-          sourceBinScanned: false,
-          destBinScanned: false
-        },
-        {
-          itemCode: 'CHM-002',
-          materialName: 'Calcium Carbonate',
-          sourceBin: 'QTN-A-02',
-          destBin: 'STD-A-02-02',
-          qty: 25,
           uom: 'KG',
           status: 'pending',
           boxScanned: false,
@@ -774,7 +1037,7 @@ onMounted(() => {
       toNumber: 'TO-2024-09-002',
       creationDate: new Date('2024-09-18T09:15:00'),
       warehouse: 'WH-001',
-      type: 'Transfer',
+      type: 'Transfer - Bin to Bin',
       status: 'In Progress',
       items: [
         {
@@ -796,14 +1059,14 @@ onMounted(() => {
       toNumber: 'TO-2024-09-003',
       creationDate: new Date('2024-09-17T14:30:00'),
       warehouse: 'WH-001',
-      type: 'Picking',
+      type: 'Picking - Production',
       status: 'Completed',
       items: [
         {
           itemCode: 'CHM-004',
           materialName: 'Magnesium Sulfate',
           sourceBin: 'STD-C-01-01',
-          destBin: 'SHIP-OUT-01',
+          destBin: 'PROD-OUT-01',
           qty: 30,
           actualQty: 30,
           uom: 'KG',
@@ -819,15 +1082,15 @@ onMounted(() => {
       toNumber: 'TO-2024-09-004',
       creationDate: new Date('2024-09-18T10:45:00'),
       warehouse: 'WH-002',
-      type: 'Putaway',
+      type: 'Picking - Sales Order',
       status: 'Pending',
-      reservationNo: 'RSV-2024-046',
+      reservationNo: 'SO-2024-128',
       items: [
         {
           itemCode: 'CHM-005',
           materialName: 'Hydrochloric Acid',
-          sourceBin: 'QTN-B-01',
-          destBin: 'HAZ-A-01-01',
+          sourceBin: 'HAZ-A-01-01',
+          destBin: 'SHIP-OUT-01',
           qty: 20,
           uom: 'L',
           status: 'pending',

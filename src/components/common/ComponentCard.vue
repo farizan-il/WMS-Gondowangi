@@ -6,6 +6,12 @@
       <div class="text-sm text-gray-600 dark:text-gray-400">
         Total item menunggu QC: {{ itemsToQC.length }}
       </div>
+      <button @click="openQRScanner" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h2M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z"/>
+          </svg>
+          Scan QR Code
+        </button>
     </div>
 
     <!-- Tabel Daftar QC -->
@@ -43,7 +49,7 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex space-x-2">
-                  <button v-if="item.statusQC === 'To QC'" @click="openQCModal(item)" class="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 px-3 py-1 rounded text-xs">
+                  <button v-if="item.statusQC === 'To QC'" @click="showItemDetail(item)" class="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 px-3 py-1 rounded text-xs">
                     Periksa QC
                   </button>
                   <button v-if="item.statusQC === 'PASS'" @click="printGRSlip(item)" class="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800 px-2 py-1 rounded text-xs">
@@ -63,7 +69,93 @@
       </div>
     </div>
 
-    <!-- Modal Form QC -->
+    <!-- Modal Detail Item (Step 1) -->
+    <div v-if="showDetailModal" class="fixed inset-0 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[9999]" style="background-color: rgba(43, 51, 63, 0.67);">
+      <div class="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+          <!-- Header Modal -->
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Detail Item QC - {{ selectedItem?.kodeItem }}</h3>
+            <button @click="closeDetailModal" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Detail Informasi -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">No Shipment</label>
+                <div class="mt-1 text-sm text-gray-900 dark:text-white font-medium">{{ selectedItem?.shipmentNumber }}</div>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">No PO</label>
+                <div class="mt-1 text-sm text-gray-900 dark:text-white">{{ selectedItem?.noPo }}</div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">No Surat Jalan</label>
+                <div class="mt-1 text-sm text-gray-900 dark:text-white">{{ selectedItem?.noSuratJalan }}</div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kode Item</label>
+                <div class="mt-1 text-sm text-gray-900 dark:text-white font-medium">{{ selectedItem?.kodeItem }}</div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Material</label>
+                <div class="mt-1 text-sm text-gray-900 dark:text-white">{{ selectedItem?.namaMaterial }}</div>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Supplier</label>
+                <div class="mt-1 text-sm text-gray-900 dark:text-white">{{ selectedItem?.supplier }}</div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Quantity Received</label>
+                <div class="mt-1 text-sm text-gray-900 dark:text-white font-medium">{{ selectedItem?.qtyReceived }} {{ selectedItem?.uom }}</div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">No Kendaraan</label>
+                <div class="mt-1 text-sm text-gray-900 dark:text-white">{{ selectedItem?.noKendaraan }}</div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Driver</label>
+                <div class="mt-1 text-sm text-gray-900 dark:text-white">{{ selectedItem?.namaDriver }}</div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status QC</label>
+                <span :class="getQCStatusClass(selectedItem?.statusQC)" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
+                  {{ selectedItem?.statusQC }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer Modal -->
+          <div class="flex justify-end space-x-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
+            <button @click="closeDetailModal" class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">
+              Tutup
+            </button>
+            <button @click="openQCModal" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+              Lanjut QC
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Form QC (Step 2) -->
     <div v-if="showQCModal" class="fixed inset-0 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[9999]" style="background-color: rgba(43, 51, 63, 0.67);">
       <div class="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div class="p-6">
@@ -107,11 +199,6 @@
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Material</label>
               <input v-model="qcForm.namaMaterial" type="text" readonly class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-600 text-gray-900 dark:text-white">
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Serial Number</label>
-              <input v-model="qcForm.serialNumber" type="text" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
             </div>
 
             <div>
@@ -233,11 +320,55 @@
 
           <!-- Footer Modal -->
           <div class="flex justify-end space-x-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
-            <button @click="closeQCModal" class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">
-              Batal
+            <button @click="backToDetail" class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">
+              Kembali ke Detail
             </button>
             <button @click="submitQC" :disabled="!isQCFormValid" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400">
               Simpan Hasil QC
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal QR Scanner -->
+    <div v-if="showQRScanner" class="fixed inset-0 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[9999]" style="background-color: rgba(43, 51, 63, 0.67);">
+      <div class="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full mx-4">
+        <div class="p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Scan QR Code</h3>
+            <button @click="closeQRScanner" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="space-y-4">
+            <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg text-center">
+              <svg class="w-16 h-16 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h2M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z"/>
+              </svg>
+              <p class="text-sm text-gray-600 dark:text-gray-400">Arahkan kamera ke QR Code</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Atau input manual QR Code:</label>
+              <input v-model="manualQRInput" @keyup.enter="processQRCode(manualQRInput)" type="text" placeholder="Contoh: IN/20250918/0001|RM-001 atau IN/20250918/0002|PM-001" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+              
+              <!-- Contoh QR Code untuk testing -->
+              <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                <p>Contoh QR Code yang tersedia untuk testing:</p>
+                <div class="mt-1 space-y-1">
+                  <div class="cursor-pointer hover:text-blue-500" @click="manualQRInput = 'IN/20250918/0001|RM-001'">• IN/20250918/0001|RM-001 (Tepung Terigu)</div>
+                  <div class="cursor-pointer hover:text-blue-500" @click="manualQRInput = 'IN/20250918/0002|PM-001'">• IN/20250918/0002|PM-001 (Plastik Kemasan)</div>
+                  <div class="cursor-pointer hover:text-blue-500" @click="manualQRInput = 'IN/20250918/0003|RM-002'">• IN/20250918/0003|RM-002 (Gula Pasir)</div>
+                </div>
+              </div>
+            </div>
+            
+            <button @click="processQRCode(manualQRInput)" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md">
+              Process QR Code
             </button>
           </div>
         </div>
@@ -250,9 +381,12 @@
 import { ref, computed, onMounted } from 'vue'
 
 // Data reaktif
+const showDetailModal = ref(false)
 const showQCModal = ref(false)
+const showQRScanner = ref(false)
 const selectedItem = ref(null)
 const itemsToQC = ref([])
+const manualQRInput = ref('')
 
 // Form QC data
 const qcForm = ref({
@@ -299,47 +433,32 @@ const initDummyData = () => {
     },
     {
       id: 2,
-      shipmentNumber: 'IN/20250918/0001',
-      noPo: 'PO-001/2025',
-      noSuratJalan: 'SJ-001/2025',
-      supplier: 'PT Supplier A',
+      shipmentNumber: 'IN/20250918/0002',
+      noPo: 'PO-002/2025',
+      noSuratJalan: 'SJ-002/2025',
+      supplier: 'PT Supplier B',
       kodeItem: 'PM-001',
-      namaMaterial: 'Kardus Box 20x30',
+      namaMaterial: 'Plastik Kemasan',
       qtyReceived: 100,
       uom: 'PCS',
-      statusQC: 'To QC',
-      noKendaraan: 'B 1234 CD',
-      namaDriver: 'Budi Santoso',
+      statusQC: 'PASS',
+      noKendaraan: 'B 5678 EF',
+      namaDriver: 'Ahmad Suryadi',
       kategori: 'Packaging Material'
     },
     {
       id: 3,
-      shipmentNumber: 'IN/20250917/0001',
-      noPo: 'PO-002/2025',
-      noSuratJalan: 'SJ-002/2025',
-      supplier: 'PT Supplier B',
+      shipmentNumber: 'IN/20250918/0003',
+      noPo: 'PO-003/2025',
+      noSuratJalan: 'SJ-003/2025',
+      supplier: 'PT Supplier C',
       kodeItem: 'RM-002',
       namaMaterial: 'Gula Pasir',
       qtyReceived: 25,
       uom: 'KG',
-      statusQC: 'PASS',
-      noKendaraan: 'B 5678 EF',
-      namaDriver: 'Andi Wijaya',
-      kategori: 'Raw Material'
-    },
-    {
-      id: 4,
-      shipmentNumber: 'IN/20250916/0001',
-      noPo: 'PO-003/2025',
-      noSuratJalan: 'SJ-003/2025',
-      supplier: 'CV Supplier C',
-      kodeItem: 'RM-003',
-      namaMaterial: 'Garam Dapur',
-      qtyReceived: 10,
-      uom: 'KG',
       statusQC: 'REJECT',
       noKendaraan: 'B 9012 GH',
-      namaDriver: 'Soni Pratama',
+      namaDriver: 'Sari Wulandari',
       kategori: 'Raw Material'
     }
   ]
@@ -348,9 +467,9 @@ const initDummyData = () => {
 // Computed
 const isQCFormValid = computed(() => {
   return qcForm.value.hasilQC && 
-         qcForm.value.kategori &&
-         qcForm.value.jumlahBoxUtuh !== '' &&
-         qcForm.value.qtyBoxUtuh !== ''
+    qcForm.value.kategori &&
+    qcForm.value.jumlahBoxUtuh !== '' &&
+    qcForm.value.qtyBoxUtuh !== ''
 })
 
 // Methods
@@ -363,38 +482,51 @@ const getQCStatusClass = (status) => {
   return classes[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
 }
 
-const openQCModal = (item) => {
+// Step 1: Show item detail
+const showItemDetail = (item) => {
   selectedItem.value = item
+  showDetailModal.value = true
+}
+
+const closeDetailModal = () => {
+  showDetailModal.value = false
+  selectedItem.value = null
+}
+
+// Step 2: Open QC Form from detail
+const openQCModal = () => {
+  if (!selectedItem.value) return
   
   // Generate form checklist number
   const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
-  const checklistNumber = `QC/${today}/${String(item.id).padStart(4, '0')}`
+  const checklistNumber = `QC/${today}/${String(selectedItem.value.id).padStart(4, '0')}`
   
   // Fill form with item data
   qcForm.value = {
     noFormChecklist: checklistNumber,
     date: new Date().toISOString().slice(0, 16),
-    noPo: item.noPo,
-    noSuratJalan: item.noSuratJalan,
-    kodeItem: item.kodeItem,
-    namaMaterial: item.namaMaterial,
+    noPo: selectedItem.value.noPo,
+    noSuratJalan: selectedItem.value.noSuratJalan,
+    kodeItem: selectedItem.value.kodeItem,
+    namaMaterial: selectedItem.value.namaMaterial,
     serialNumber: '',
     reference: '',
-    supplier: item.supplier,
-    kategori: item.kategori,
+    supplier: selectedItem.value.supplier,
+    kategori: selectedItem.value.kategori,
     jumlahBoxUtuh: '',
     qtyBoxUtuh: '',
     jumlahBoxTidakUtuh: '',
     qtyBoxTidakUtuh: '',
-    totalIncoming: item.qtyReceived,
-    uom: item.uom,
-    noKendaraan: item.noKendaraan,
-    namaDriver: item.namaDriver,
+    totalIncoming: selectedItem.value.qtyReceived,
+    uom: selectedItem.value.uom,
+    noKendaraan: selectedItem.value.noKendaraan,
+    namaDriver: selectedItem.value.namaDriver,
     defectCount: 0,
     catatanQC: '',
     hasilQC: ''
   }
   
+  showDetailModal.value = false
   showQCModal.value = true
 }
 
@@ -402,6 +534,11 @@ const closeQCModal = () => {
   showQCModal.value = false
   selectedItem.value = null
   resetQCForm()
+}
+
+const backToDetail = () => {
+  showQCModal.value = false
+  showDetailModal.value = true
 }
 
 const resetQCForm = () => {
@@ -453,6 +590,50 @@ const submitQC = () => {
   }
   
   closeQCModal()
+}
+
+// QR Scanner functions
+const openQRScanner = () => {
+  showQRScanner.value = true
+  manualQRInput.value = ''
+}
+
+const closeQRScanner = () => {
+  showQRScanner.value = false
+  manualQRInput.value = ''
+}
+
+const processQRCode = (qrData) => {
+  if (!qrData) {
+    alert('Silakan masukkan QR Code terlebih dahulu!')
+    return
+  }
+  
+  // Parse QR Code format: IN/20250918/0001|RM-001 (simplified format)
+  const qrParts = qrData.split('|')
+  if (qrParts.length < 2) {
+    alert('Format QR Code tidak valid! Format yang benar: SHIPMENT_NUMBER|KODE_ITEM')
+    return
+  }
+  
+  const [shipmentNumber, kodeItem] = qrParts
+  
+  console.log('Searching for:', { shipmentNumber, kodeItem }) // Debug log
+  console.log('Available items:', itemsToQC.value) // Debug log
+  
+  // Find item by shipment number and kode item
+  const foundItem = itemsToQC.value.find(item => 
+    item.shipmentNumber.trim() === shipmentNumber.trim() && 
+    item.kodeItem.trim() === kodeItem.trim()
+  )
+  
+  if (foundItem) {
+    console.log('Item found:', foundItem) // Debug log
+    closeQRScanner()
+    showItemDetail(foundItem)
+  } else {
+    alert(`Item tidak ditemukan dalam daftar QC!\nYang dicari: ${shipmentNumber} | ${kodeItem}\n\nItem yang tersedia:\n${itemsToQC.value.map(item => `${item.shipmentNumber} | ${item.kodeItem}`).join('\n')}`)
+  }
 }
 
 // Action handlers
