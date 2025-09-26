@@ -55,6 +55,145 @@
       </div>
     </div>
 
+    <!-- Modal Detail Penerimaan -->
+    <div v-if="showDetailModal" class="fixed inset-0 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[9999]" style="background-color: #2b333fab;">
+      <div class="bg-white dark:bg-gray-800 rounded-lg max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+          <!-- Header Modal -->
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Detail Penerimaan - {{ selectedShipment?.noSuratJalan }}</h3>
+            <button @click="closeDetailModal" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Info Shipment -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+              <div>
+                <span class="font-medium text-gray-700 dark:text-gray-300">No Incoming:</span>
+                <span class="ml-2 text-gray-900 dark:text-white">{{ selectedShipment?.incomingNumber }}</span>
+              </div>
+              <div>
+                <span class="font-medium text-gray-700 dark:text-gray-300">No PO:</span>
+                <span class="ml-2 text-gray-900 dark:text-white">{{ selectedShipment?.noPo }}</span>
+              </div>
+              <div>
+                <span class="font-medium text-gray-700 dark:text-gray-300">Supplier:</span>
+                <span class="ml-2 text-gray-900 dark:text-white">{{ selectedShipment?.supplier }}</span>
+              </div>
+              <div>
+                <span class="font-medium text-gray-700 dark:text-gray-300">No Kendaraan:</span>
+                <span class="ml-2 text-gray-900 dark:text-white">{{ selectedShipment?.noKendaraan }}</span>
+              </div>
+              <div>
+                <span class="font-medium text-gray-700 dark:text-gray-300">Nama Driver:</span>
+                <span class="ml-2 text-gray-900 dark:text-white">{{ selectedShipment?.namaDriver }}</span>
+              </div>
+              <div>
+                <span class="font-medium text-gray-700 dark:text-gray-300">Tanggal Terima:</span>
+                <span class="ml-2 text-gray-900 dark:text-white">{{ formatDate(selectedShipment?.tanggalTerima) }}</span>
+              </div>
+              <div>
+                <span class="font-medium text-gray-700 dark:text-gray-300">Kategori:</span>
+                <span class="ml-2 text-gray-900 dark:text-white">{{ selectedShipment?.kategori }}</span>
+              </div>
+              <div>
+                <span class="font-medium text-gray-700 dark:text-gray-300">Status:</span>
+                <span :class="getStatusClass(selectedShipment?.status)" class="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                  {{ selectedShipment?.status }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detail Items -->
+          <div class="border-t border-gray-200 dark:border-gray-600 pt-6">
+            <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Detail Material</h4>
+            
+            <div class="overflow-x-auto border border-gray-200 dark:border-gray-600 rounded-lg">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600" style="min-width: 1400px;">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                  <tr>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Kode Item</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Nama Material</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Batch/Mfg Lot</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Exp Date</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Qty Wadah</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Qty Unit</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Kondisi</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">CoA</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Label Mfg</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Label & CoA Sesuai</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Pabrik Pembuat</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap">Status QC</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-600 bg-white dark:bg-gray-800">
+                  <tr v-for="(item, index) in selectedShipment?.items" :key="index">
+                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ item.kodeItem }}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ item.namaMaterial }}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ item.batchLot }}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ item.expDate }}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ item.qtyWadah }}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ item.qtyUnit }}</td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <div class="flex gap-1">
+                        <span v-if="item.kondisiBaik" class="bg-green-500 text-white px-2 py-1 text-xs rounded">Baik</span>
+                        <span v-if="item.kondisiTidakBaik" class="bg-red-500 text-white px-2 py-1 text-xs rounded">Tidak Baik</span>
+                      </div>
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <div class="flex gap-1">
+                        <span v-if="item.coaAda" class="bg-green-500 text-white px-2 py-1 text-xs rounded">Ada</span>
+                        <span v-if="item.coaTidakAda" class="bg-red-500 text-white px-2 py-1 text-xs rounded">Tidak</span>
+                      </div>
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <div class="flex gap-1">
+                        <span v-if="item.labelMfgAda" class="bg-green-500 text-white px-2 py-1 text-xs rounded">Ada</span>
+                        <span v-if="item.labelMfgTidakAda" class="bg-red-500 text-white px-2 py-1 text-xs rounded">Tidak</span>
+                      </div>
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <div class="flex gap-1">
+                        <span v-if="item.labelCoaSesuai" class="bg-green-500 text-white px-2 py-1 text-xs rounded">Sesuai</span>
+                        <span v-if="item.labelCoaTidakSesuai" class="bg-red-500 text-white px-2 py-1 text-xs rounded">Tidak Sesuai</span>
+                      </div>
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ item.pabrikPembuat }}</td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                      <span :class="item.statusQC === 'To QC' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                        {{ item.statusQC }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Footer Modal -->
+          <div class="flex justify-end space-x-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
+            <button @click="closeDetailModal" class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">
+              Tutup
+            </button>
+            <button @click="printChecklist(selectedShipment)" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+              Cetak Checklist
+            </button>
+            <button @click="printFinanceSlip(selectedShipment)" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">
+              Cetak Finance
+            </button>
+            <button @click="showQRModal(selectedShipment)" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+              Cetak Label QR
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal Form Buat Penerimaan -->
     <div v-if="showModal" class="fixed inset-0 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[9999]" style="background-color: #2b333fab;">
       <div class="bg-white dark:bg-gray-800 rounded-lg max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto">
@@ -328,6 +467,7 @@ import { ref, computed, onMounted } from 'vue'
 // Data reaktif
 const showModal = ref(false)
 const showQRCodeModal = ref(false)
+const showDetailModal = ref(false)
 const selectedShipment = ref(null)
 const shipments = ref([])
 
@@ -442,6 +582,16 @@ const isFormValid = computed(() => {
 })
 
 // Methods
+const viewDetail = (shipment) => {
+  selectedShipment.value = shipment
+  showDetailModal.value = true
+}
+
+const closeDetailModal = () => {
+  showDetailModal.value = false
+  selectedShipment.value = null
+}
+
 const closeModal = () => {
   showModal.value = false
   resetForm()
@@ -597,10 +747,6 @@ const getStatusClass = (status) => {
   return classes[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
 }
 
-// Action handlers
-const viewDetail = (shipment) => {
-  alert(`Melihat detail shipment: ${shipment.incomingNumber || shipment.noSuratJalan}`)
-}
 
 const printChecklist = (shipment) => {
   // Create print window with checklist form
@@ -608,193 +754,462 @@ const printChecklist = (shipment) => {
   
   let itemsHTML = ''
   shipment.items.forEach((item, index) => {
-    const wadahStart = index * parseInt(item.qtyWadah || '1') + 1
+    const wadahStart = index + 1
     const wadahEnd = wadahStart + parseInt(item.qtyWadah || '1') - 1
     
     itemsHTML += `
-      <tr style="border: 1px solid #000; page-break-inside: avoid;">
-        <td style="border: 1px solid #000; padding: 8px; text-align: center;">${wadahStart}${wadahEnd !== wadahStart ? `-${wadahEnd}` : ''}</td>
-        <td style="border: 1px solid #000; padding: 8px; text-align: center;">
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <div>
-              <span>Bersih, utuh, tidak sobek/penyok, dll</span><br>
-              <span>${item.kondisiBaik ? '✓' : '-'}</span>
-            </div>
-            <div>
-              <span>Kotor (potensi kotor sampai kedalam)</span><br>
-              <span>${item.kondisiTidakBaik ? '✓' : '-'}</span>
-            </div>
-            <div>
-              <span>Sobek</span><br>
-              <span>-</span>
-            </div>
-            <div>
-              <span>Penyok yang mempengaruhi material</span><br>
-              <span>-</span>
-            </div>
-          </div>
+      <tr>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center; vertical-align: middle; height: 40px;">
+          ${wadahStart}${wadahEnd !== wadahStart ? `-${wadahEnd}` : ''}
         </td>
-        <td style="border: 1px solid #000; padding: 8px; text-align: center;">
-          <div>Ada: ${item.labelMfgAda ? '✓' : '-'}</div>
-          <div>Tidak: ${item.labelMfgTidakAda ? '✓' : '-'}</div>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center; vertical-align: middle;">
+          ${item.kondisiBaik ? '✓' : ''}
         </td>
-        <td style="border: 1px solid #000; padding: 8px; text-align: center;">PCS</td>
-        <td style="border: 1px solid #000; padding: 8px; text-align: center;">N/A</td>
-        <td style="border: 1px solid #000; padding: 8px; text-align: center;">N/A</td>
-        <td style="border: 1px solid #000; padding: 8px; text-align: center;">${item.qtyUnit}</td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center; vertical-align: middle;">
+          ${item.kondisiTidakBaik ? '✓' : ''}
+        </td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center; vertical-align: middle;"></td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center; vertical-align: middle;"></td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center; vertical-align: middle;">
+          ${item.labelMfgAda ? '✓' : ''}
+        </td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center; vertical-align: middle;">
+          ${item.labelMfgTidakAda ? '✓' : ''}
+        </td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center; vertical-align: middle;">PCS</td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center; vertical-align: middle;">N/A</td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center; vertical-align: middle;">N/A</td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center; vertical-align: middle;">${item.qtyUnit}</td>
       </tr>
     `
   })
+  
+  // Add empty rows to fill the table (total 8-10 rows)
+  for(let i = shipment.items.length; i < 10; i++) {
+    itemsHTML += `
+      <tr>
+        <td style="border: 1px solid #000; padding: 8px; height: 40px;">&nbsp;</td>
+        <td style="border: 1px solid #000; padding: 8px;">&nbsp;</td>
+        <td style="border: 1px solid #000; padding: 8px;">&nbsp;</td>
+        <td style="border: 1px solid #000; padding: 8px;">&nbsp;</td>
+        <td style="border: 1px solid #000; padding: 8px;">&nbsp;</td>
+        <td style="border: 1px solid #000; padding: 8px;">&nbsp;</td>
+        <td style="border: 1px solid #000; padding: 8px;">&nbsp;</td>
+        <td style="border: 1px solid #000; padding: 8px;">&nbsp;</td>
+        <td style="border: 1px solid #000; padding: 8px;">&nbsp;</td>
+        <td style="border: 1px solid #000; padding: 8px;">&nbsp;</td>
+        <td style="border: 1px solid #000; padding: 8px;">&nbsp;</td>
+      </tr>
+    `
+  }
   
   printWindow.document.write(`
     <html>
       <head>
         <title>Form Checklist Penerimaan Material - ${shipment.noSuratJalan}</title>
         <style>
-          body { font-family: Arial, sans-serif; margin: 20px; font-size: 12px; }
-          .header { text-align: center; margin-bottom: 20px; }
-          .form-info { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-          .form-group { margin-bottom: 10px; }
-          .form-group label { font-weight: bold; }
-          .checkbox-group { display: inline-flex; gap: 10px; }
-          table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-          th, td { border: 1px solid #000; padding: 5px; text-align: left; }
-          th { background-color: #f0f0f0; font-weight: bold; text-align: center; }
-          .signature-section { display: flex; justify-content: space-between; margin-top: 30px; }
-          .signature-box { border: 1px solid #000; padding: 20px; width: 200px; text-align: center; }
+          @page {
+            size: A4;
+            margin: 1cm;
+          }
+          
+          body { 
+            font-family: Arial, sans-serif; 
+            margin: 0;
+            padding: 0;
+            font-size: 10px;
+            line-height: 1.2;
+          }
+          
+          .main-container {
+            border: 2px solid #000;
+            padding: 0;
+            width: 100%;
+            box-sizing: border-box;
+          }
+          
+          .header { 
+            text-align: center; 
+            padding: 10px;
+            border-bottom: 1px solid #000;
+            position: relative;
+            height: 80px;
+            box-sizing: border-box;
+          }
+          
+          .logo-section {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            width: 100px;
+            height: 60px;
+          }
+          
+          .logo-box {
+            border: 1px solid #000;
+            padding: 5px;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+          }
+          
+          .logo-icon {
+            width: 30px;
+            height: 20px;
+            background: linear-gradient(45deg, #4CAF50, #2E7D32);
+            margin-bottom: 3px;
+            position: relative;
+          }
+          
+          .logo-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 15px;
+            height: 15px;
+            background: #FFF;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+          }
+          
+          .company-name {
+            font-weight: bold;
+            font-size: 8px;
+            color: #2E7D32;
+          }
+          
+          .form-number-section {
+            position: absolute;
+            right: 10px;
+            top: 15px;
+            width: 120px;
+            text-align: center;
+          }
+          
+          .form-number-box {
+            background: #000;
+            color: white;
+            padding: 3px;
+            font-size: 9px;
+            font-weight: bold;
+          }
+          
+          .header-title {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 11px;
+          }
+          
+          .form-fields {
+            border-collapse: collapse;
+            width: 100%;
+          }
+          
+          .form-fields tr {
+            border-bottom: 1px solid #000;
+          }
+          
+          .form-fields tr:last-child {
+            border-bottom: none;
+          }
+          
+          .form-fields td {
+            border-right: 1px solid #000;
+            padding: 6px 8px;
+            vertical-align: middle;
+            height: 25px;
+          }
+          
+          .form-fields td:last-child {
+            border-right: none;
+          }
+          
+          .field-label {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            width: 120px;
+          }
+          
+          .field-value {
+            width: auto;
+          }
+          
+          .checkbox-inline {
+            display: inline-block;
+            margin-right: 15px;
+          }
+          
+          .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0;
+          }
+          
+          .data-table th,
+          .data-table td {
+            border: 1px solid #000;
+            padding: 5px;
+            text-align: center;
+            vertical-align: middle;
+          }
+          
+          .data-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            font-size: 9px;
+            height: 30px;
+          }
+          
+          .main-header {
+            height: 50px;
+          }
+          
+          .sub-header {
+            height: 35px;
+            font-size: 8px;
+            line-height: 1.1;
+          }
+          
+          .kemasan-header {
+            width: 200px;
+          }
+          
+          .label-header {
+            width: 100px;
+          }
+          
+          .unit-header {
+            width: 50px;
+          }
+          
+          .jumlah-headers {
+            width: 60px;
+          }
+          
+          .wadah-col {
+            width: 60px;
+          }
+          
+          .kemasan-cols {
+            width: 100px;
+          }
+          
+          .label-cols {
+            width: 50px;
+          }
+          
+          .signature-section {
+            border-top: 1px solid #000;
+            display: flex;
+            height: 120px;
+          }
+          
+          .signature-left,
+          .signature-right {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+          }
+          
+          .signature-left {
+            border-right: 1px solid #000;
+          }
+          
+          .signature-title {
+            font-weight: bold;
+            margin-bottom: 50px;
+          }
+          
+          .signature-fields {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            text-align: left;
+            font-size: 9px;
+          }
+          
+          .footer-note {
+            padding: 10px;
+            font-size: 8px;
+            font-style: italic;
+            border-top: 1px solid #000;
+          }
+          
           @media print {
-            body { margin: 0; }
+            body { 
+              margin: 0;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
             .no-print { display: none; }
           }
         </style>
       </head>
       <body>
-        <div class="header">
-          <div><strong>No. Dok : GF1001-03</strong></div>
-          <div><strong>Rev : 00</strong></div>
-          <h2>E-FORM CHECKLIST PENERIMAAN MATERIAL DARI VENDOR</h2>
-          <div><strong>( ${shipment.incomingNumber || 'No Form Checklist'} )</strong></div>
-        </div>
-        
-        <div class="form-info">
-          <div>
-            <div class="form-group">
-              <label>Kode Item :</label> ${shipment.items[0]?.kodeItem || ''}
+        <div class="main-container">
+          <div class="header">
+            <div class="logo-section">
+              <div class="logo-box">
+                <div class="logo-icon"></div>
+                <div class="company-name">GONDOWANGI</div>
+              </div>
             </div>
-            <div class="form-group">
-              <label>Nama Material :</label> ${shipment.items[0]?.namaMaterial || ''}
+            
+            <div class="form-number-section">
+              <div class="form-number-box">( No Form Checklist )</div>
             </div>
-            <div class="form-group">
-              <label>Label dari Mfg* :</label>
-              <span class="checkbox-group">
-                Ada ${shipment.items[0]?.labelMfgAda ? '✓' : '☐'} / Tidak ${shipment.items[0]?.labelMfgTidakAda ? '✓' : '☐'}
-              </span>
-            </div>
-            <div class="form-group">
-              <label>Label & CoA sesuai :</label>
-              <span class="checkbox-group">
-                Ada ${shipment.items[0]?.labelCoaSesuai ? '✓' : '☐'} / Tidak ${shipment.items[0]?.labelCoaTidakSesuai ? '✓' : '☐'}
-              </span>
-            </div>
-            <div class="form-group">
-              <label>Pabrik Pembuat (mfg)* :</label> ${shipment.items[0]?.pabrikPembuat || ''}
-            </div>
-            <div class="form-group">
-              <label>Produksi di negara* :</label> Indonesia
-            </div>
+            
+            <div class="header-title">E-FORM CHECKLIST PENERIMAAN MATERIAL DARI VENDOR</div>
           </div>
-          <div>
-            <div class="form-group">
-              <label>Supplier :</label> ${shipment.supplier}
-            </div>
-            <div class="form-group">
-              <label>No. PO :</label> ${shipment.noPo}
-            </div>
-            <div class="form-group">
-              <label>No. Surat Jalan :</label> ${shipment.noSuratJalan}
-            </div>
-            <div class="form-group">
-              <label>Mfg. Batch :</label> ${shipment.items[0]?.batchLot || ''}
-            </div>
-            <div class="form-group">
-              <label>ED :</label> ${shipment.items[0]?.expDate || ''}
-            </div>
-            <div class="form-group">
-              <label>CoA :</label>
-              <span class="checkbox-group">
-                Ada ${shipment.items[0]?.coaAda ? '✓' : '☐'} / Tidak ${shipment.items[0]?.coaTidakAda ? '✓' : '☐'}
-              </span>
-            </div>
-            <div class="form-group">
-              <label>Jumlah Wadah :</label> ${shipment.items[0]?.qtyWadah || ''}
-            </div>
-            <div class="form-group">
-              <label>Tgl. Diterima :</label> ${formatDateOnly(shipment.tanggalTerima)}
-              Start : ${formatTime(shipment.tanggalTerima)} WIB End : _____ WIB
-            </div>
-            <div class="form-group">
-              <label>Kategori :</label> ${shipment.kategori || ''}
-            </div>
-            <div class="form-group">
-              <label>Nama Driver :</label> ${shipment.namaDriver}
-            </div>
-            <div class="form-group">
-              <label>No Kendaraan :</label> ${shipment.noKendaraan}
-            </div>
-          </div>
-        </div>
-        
-        <table>
-          <thead>
+          
+          <table class="form-fields">
             <tr>
-              <th>Wadah Ke-</th>
-              <th style="width: 300px;">Kemasan</th>
-              <th>Label</th>
-              <th>Unit</th>
-              <th>Bruto</th>
-              <th>Tara</th>
-              <th>Netto</th>
+              <td class="field-label">Kode Item</td>
+              <td class="field-value">${shipment.items[0]?.kodeItem || ''}</td>
             </tr>
             <tr>
-              <th></th>
-              <th>
-                <div style="display: flex; justify-content: space-around;">
-                  <span>BAIK</span>
-                  <span>TIDAK BAIK</span>
-                </div>
-              </th>
-              <th>
-                <div>Ada</div>
-                <div>Tidak</div>
-              </th>
-              <th>Jumlah</th>
-              <th></th>
-              <th></th>
-              <th></th>
+              <td class="field-label">Nama Material</td>
+              <td class="field-value">${shipment.items[0]?.namaMaterial || ''}</td>
             </tr>
-          </thead>
-          <tbody>
-            ${itemsHTML}
-          </tbody>
-        </table>
-        
-        <div class="signature-section">
-          <div class="signature-box">
-            <div><strong>Dilaporkan oleh</strong></div>
-            <br><br><br>
-            <div>Nama :</div>
-            <div>Tanggal :</div>
+            <tr>
+              <td class="field-label">Label dari Mfg*</td>
+              <td class="field-value">
+                <span class="checkbox-inline">Ada ${shipment.items[0]?.labelMfgAda ? '✓' : ''}</span>
+                <span class="checkbox-inline">Tidak ${shipment.items[0]?.labelMfgTidakAda ? '✓' : ''}</span>
+                <span style="margin-left: 100px;">Label & CoA sesuai :</span>
+                <span class="checkbox-inline">Ada ${shipment.items[0]?.labelCoaSesuai ? '✓' : ''}</span>
+                <span class="checkbox-inline">Tidak ${shipment.items[0]?.labelCoaTidakSesuai ? '✓' : ''}</span>
+              </td>
+            </tr>
+            <tr>
+              <td class="field-label">Pabrik Pembuat (mfg)*</td>
+              <td class="field-value">${shipment.items[0]?.pabrikPembuat || ''}</td>
+            </tr>
+            <tr>
+              <td class="field-label">Produksi di negara*</td>
+              <td class="field-value">Indonesia</td>
+            </tr>
+            <tr>
+              <td class="field-label">Supplier</td>
+              <td class="field-value">${shipment.supplier}</td>
+            </tr>
+            <tr>
+              <td class="field-label">No. PO</td>
+              <td class="field-value">${shipment.noPo}</td>
+            </tr>
+            <tr>
+              <td class="field-label">No. Surat Jalan</td>
+              <td class="field-value">${shipment.noSuratJalan}</td>
+            </tr>
+            <tr>
+              <td class="field-label">Mfg. Batch</td>
+              <td class="field-value">${shipment.items[0]?.batchLot || ''}</td>
+            </tr>
+            <tr>
+              <td class="field-label">ED</td>
+              <td class="field-value">${shipment.items[0]?.expDate || ''}</td>
+            </tr>
+            <tr>
+              <td class="field-label">CoA</td>
+              <td class="field-value">
+                <span class="checkbox-inline">Ada ${shipment.items[0]?.coaAda ? '✓' : ''}</span>
+                <span class="checkbox-inline">Tidak ${shipment.items[0]?.coaTidakAda ? '✓' : ''}</span>
+              </td>
+            </tr>
+            <tr>
+              <td class="field-label">Jumlah Wadah</td>
+              <td class="field-value">${shipment.items[0]?.qtyWadah || ''}</td>
+            </tr>
+            <tr>
+              <td class="field-label">Tgl. Diterima</td>
+              <td class="field-value">
+                ${formatDateOnly(shipment.tanggalTerima)} &nbsp;&nbsp;&nbsp; 
+                Start : ${formatTime(shipment.tanggalTerima)} WIB &nbsp;&nbsp;&nbsp; 
+                End : _____ WIB
+              </td>
+            </tr>
+            <tr>
+              <td class="field-label">Kategori</td>
+              <td class="field-value">${shipment.kategori || ''}</td>
+            </tr>
+            <tr>
+              <td class="field-label">Nama Driver</td>
+              <td class="field-value">${shipment.namaDriver}</td>
+            </tr>
+            <tr>
+              <td class="field-label">No Kendaraan</td>
+              <td class="field-value">${shipment.noKendaraan}</td>
+            </tr>
+          </table>
+          
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th rowspan="2" class="main-header wadah-col">Wadah Ke-</th>
+                <th colspan="4" class="main-header kemasan-header">Kemasan</th>
+                <th colspan="2" class="main-header label-header">Label</th>
+                <th colspan="4" class="main-header">Jumlah</th>
+              </tr>
+              <tr>
+                <th class="sub-header kemasan-cols">BAIK</th>
+                <th class="sub-header kemasan-cols">TIDAK BAIK</th>
+                <th class="sub-header kemasan-cols">Sobek</th>
+                <th class="sub-header kemasan-cols">Penyok yang mempengaruhi material</th>
+                <th class="sub-header label-cols">Ada</th>
+                <th class="sub-header label-cols">Tidak</th>
+                <th class="sub-header unit-header">Unit</th>
+                <th class="sub-header jumlah-headers">Bruto</th>
+                <th class="sub-header jumlah-headers">Tara</th>
+                <th class="sub-header jumlah-headers">Netto</th>
+              </tr>
+              <tr>
+                <th style="height: 25px; font-size: 8px;"></th>
+                <th style="height: 25px; font-size: 7px; line-height: 1;">
+                  Bersih, utuh, tidak<br>sobek/penyok, dll
+                </th>
+                <th style="height: 25px; font-size: 7px; line-height: 1;">
+                  Kotor (potensi kotor<br>sampai kedalam)
+                </th>
+                <th style="height: 25px; font-size: 8px;"></th>
+                <th style="height: 25px; font-size: 8px;"></th>
+                <th style="height: 25px; font-size: 8px;"></th>
+                <th style="height: 25px; font-size: 8px;"></th>
+                <th style="height: 25px; font-size: 8px;">Jumlah</th>
+                <th style="height: 25px; font-size: 8px;"></th>
+                <th style="height: 25px; font-size: 8px;"></th>
+                <th style="height: 25px; font-size: 8px;"></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHTML}
+            </tbody>
+          </table>
+          
+          <div class="signature-section">
+            <div class="signature-left">
+              <div class="signature-title">Dilaporkan oleh</div>
+              <div class="signature-fields">
+                <div>Nama &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</div>
+                <div>Tanggal &nbsp;&nbsp;:</div>
+              </div>
+            </div>
+            <div class="signature-right">
+              <div class="signature-title">Diperiksa Oleh</div>
+              <div class="signature-fields">
+                <div>Nama &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</div>
+                <div>Tanggal &nbsp;&nbsp;:</div>
+              </div>
+            </div>
           </div>
-          <div class="signature-box">
-            <div><strong>Diperiksa Oleh</strong></div>
-            <br><br><br>
-            <div>Nama :</div>
-            <div>Tanggal :</div>
+          
+          <div class="footer-note">
+            *khusus untuk bahan baku
           </div>
-        </div>
-        
-        <div style="margin-top: 20px; font-size: 10px;">
-          <em>*khusus untuk bahan baku</em>
         </div>
         
         <div class="no-print" style="margin-top: 20px; text-align: center;">

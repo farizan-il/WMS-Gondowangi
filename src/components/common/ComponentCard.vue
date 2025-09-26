@@ -417,21 +417,6 @@ const qcForm = ref({
 const initDummyData = () => {
   itemsToQC.value = [
     {
-      id: 1,
-      shipmentNumber: 'IN/20250918/0001',
-      noPo: 'PO-001/2025',
-      noSuratJalan: 'SJ-001/2025',
-      supplier: 'PT Supplier A',
-      kodeItem: 'RM-001',
-      namaMaterial: 'Tepung Terigu',
-      qtyReceived: 50,
-      uom: 'KG',
-      statusQC: 'To QC',
-      noKendaraan: 'B 1234 CD',
-      namaDriver: 'Budi Santoso',
-      kategori: 'Raw Material'
-    },
-    {
       id: 2,
       shipmentNumber: 'IN/20250918/0002',
       noPo: 'PO-002/2025',
